@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.xkball.auto_translate.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "MixinFTBQQuest",
+    "MixinFTBQQuestObjectBase",
+    "MixinFTBQQuestScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
