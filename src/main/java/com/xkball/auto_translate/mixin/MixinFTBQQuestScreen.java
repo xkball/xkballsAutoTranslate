@@ -4,6 +4,8 @@ import com.xkball.auto_translate.api.IXATQuestScreenExtension;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
 import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
 import dev.ftb.mods.ftbquests.client.gui.quests.ViewQuestPanel;
+import dev.ftb.mods.ftbquests.quest.Quest;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,6 +39,8 @@ public abstract class MixinFTBQQuestScreen extends BaseScreen implements IXATQue
     
     @Shadow public abstract void tick();
     
+    @Shadow public abstract @Nullable Quest getViewedQuest();
+    
     @Unique
     private volatile boolean xkball_sAutoTranslate$needRefresh = false;
     
@@ -53,6 +57,7 @@ public abstract class MixinFTBQQuestScreen extends BaseScreen implements IXATQue
     public void onTick(CallbackInfo ci){
         if(xkball_sAutoTranslate$needRefresh){
             xkball_sAutoTranslate$needRefresh = false;
+            if(this.getViewedQuest() == null) return;
             this.viewQuestPanel.getViewedQuest().getTitle();
             this.viewQuestPanel.getViewedQuest().getSubtitle();
             this.viewQuestPanel.getViewedQuest().getDescription();

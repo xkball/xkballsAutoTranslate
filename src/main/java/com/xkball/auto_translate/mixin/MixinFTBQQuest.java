@@ -44,6 +44,7 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
     public void onBuildPageIndex(CallbackInfoReturnable<List<Pair<Integer, Integer>>> cir){
         if(cachedDescription == null) return;
         var list = cir.getReturnValue();
+        if(list.isEmpty()) return;
         var last = list.getLast();
         list.set(list.size() - 1, Pair.of(last.getFirst(), cachedDescription.size()-1));
     }
