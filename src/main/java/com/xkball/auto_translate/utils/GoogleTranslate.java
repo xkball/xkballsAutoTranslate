@@ -46,7 +46,7 @@ public class GoogleTranslate implements ITranslator {
         }
         task.exceptionallyAsync(t -> {
             LOGGER.error("Network error",t);
-            return "Net work error.Cannot translate the text.";
+            return ERROR_RESULT;
         });
         return task;
     }
@@ -100,17 +100,22 @@ public class GoogleTranslate implements ITranslator {
     }
     
     public static String getTranslateResult(String str){
-        str = str.substring(4);
-        var gson = new Gson();
-        var array1 = gson.fromJson(str, JsonArray.class);
-        var array2 = array1.get(0).getAsJsonArray();
-        var innerStr = array2.get(2).getAsString();
-        var array3 = gson.fromJson(innerStr, JsonArray.class);
-        var array4 = array3.get(1).getAsJsonArray();
-        var array5 = array4.get(0).getAsJsonArray();
-        var array6 = array5.get(0).getAsJsonArray();
-        var array7 = array6.get(5).getAsJsonArray();
-        var array8 = array7.get(0).getAsJsonArray();
-        return array8.get(0).getAsString();
+        try {
+            str = str.substring(4);
+            var gson = new Gson();
+            var array1 = gson.fromJson(str, JsonArray.class);
+            var array2 = array1.get(0).getAsJsonArray();
+            var innerStr = array2.get(2).getAsString();
+            var array3 = gson.fromJson(innerStr, JsonArray.class);
+            var array4 = array3.get(1).getAsJsonArray();
+            var array5 = array4.get(0).getAsJsonArray();
+            var array6 = array5.get(0).getAsJsonArray();
+            var array7 = array6.get(5).getAsJsonArray();
+            var array8 = array7.get(0).getAsJsonArray();
+            return array8.get(0).getAsString();
+        } catch (Exception e){
+            LOGGER.error("Fail to parse translate result: {}",str,e);
+            return ERROR_RESULT;
+        }
     }
 }

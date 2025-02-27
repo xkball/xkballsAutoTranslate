@@ -99,11 +99,16 @@ public class LLMTranslate implements ITranslator {
     }
     
     public static String getTranslateResult(String str){
-        var jsonObj1 = GSON.fromJson(str, JsonObject.class);
-        var jsonArray1 = jsonObj1.getAsJsonArray("choices");
-        var jsonObj2 = jsonArray1.get(0).getAsJsonObject();
-        var jsonObj3 = jsonObj2.getAsJsonObject("message");
-        return jsonObj3.get("content").getAsString();
+        try {
+            var jsonObj1 = GSON.fromJson(str, JsonObject.class);
+            var jsonArray1 = jsonObj1.getAsJsonArray("choices");
+            var jsonObj2 = jsonArray1.get(0).getAsJsonObject();
+            var jsonObj3 = jsonObj2.getAsJsonObject("message");
+            return jsonObj3.get("content").getAsString();
+        } catch (Exception e){
+            LOGGER.error("Fail to parse translate result: {}",str,e);
+            return ERROR_RESULT;
+        }
     }
     
     public static HttpClient createClient() {
