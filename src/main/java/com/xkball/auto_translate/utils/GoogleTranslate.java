@@ -18,6 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
@@ -30,19 +31,21 @@ public class GoogleTranslate implements ITranslator {
     private static final CookieManager cookieManager = new CookieManager();
     private static final AtomicInteger cookieUsed = new AtomicInteger(0);
     public static volatile HttpClient CLIENT = createClient();
-    public static final String ZN_CH = "zh_cn";
     
     public static final GoogleTranslate INSTANCE = new GoogleTranslate();
     
     private GoogleTranslate(){}
     
     public CompletableFuture<String> translate(String text, String lang) {
+        LOGGER.debug(text);
         var strArray = text.split("\n");
+        var strList = Arrays.stream(strArray).filter(s -> !s.isEmpty()).toList();
+        if (strList.isEmpty()) return CompletableFuture.completedFuture("");
         var task = CompletableFuture.runAsync(() -> updateCookies(false))
-                .thenApplyAsync((v) -> tryRunTranslate(strArray[0],lang,0));
-        for(var i = 1; i < strArray.length; i++) {
+                .thenApplyAsync((v) -> tryRunTranslate(strList.getFirst(),lang,0));
+        for(var i = 1; i < strList.size(); i++) {
             int finalI = i;
-            task = task.thenApplyAsync(str -> str + "\n" + tryRunTranslate(strArray[finalI],lang,0));
+            task = task.thenApplyAsync(str -> str + "\n" + tryRunTranslate(strList.get(finalI),lang,0));
         }
         task.exceptionallyAsync(t -> {
             LOGGER.error("Network error",t);

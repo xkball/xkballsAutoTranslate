@@ -70,6 +70,7 @@ public class LLMTranslate implements ITranslator {
     private LLMTranslate() {}
     
     public CompletableFuture<String> translate(String text, String lang){
+        LOGGER.debug(text);
         return CompletableFuture.supplyAsync(() -> tryRunTranslate(text,lang,0)).exceptionallyAsync(t -> {
             LOGGER.error("Network error",t);
             return "Net work error.Cannot translate the text.";
