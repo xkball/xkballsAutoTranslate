@@ -71,10 +71,21 @@ public class LLMTranslate implements ITranslator {
     
     public CompletableFuture<String> translate(String text, String lang){
         LOGGER.debug(text);
+        if(!validLLMConfig()) return CompletableFuture.completedFuture("Invalid llm settings!");
         return CompletableFuture.supplyAsync(() -> tryRunTranslate(text,lang,0)).exceptionallyAsync(t -> {
             LOGGER.error("Network error",t);
             return "Net work error.Cannot translate the text.";
         });
+    }
+    
+    private static boolean validLLMConfig(){
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            URI.create(XATConfig.LLM_API_URL);
+        }catch (IllegalArgumentException e){
+            return false;
+        }
+        return !XATConfig.LLM_API_KEY.isEmpty() && !XATConfig.LLM_MODEL.isEmpty() && !XATConfig.LLM_SYSTEM_PROMPT.isEmpty();
     }
     
     private static String tryRunTranslate(String text, String lang, int retries){
