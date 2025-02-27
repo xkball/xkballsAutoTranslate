@@ -1,9 +1,8 @@
 package com.xkball.auto_translate.crossmod;
 
+import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.IXATQuestExtension;
 import com.xkball.auto_translate.api.IXATQuestScreenExtension;
-import com.xkball.auto_translate.utils.GoogleTranslate;
-import com.xkball.auto_translate.utils.LLMTranslate;
 import dev.ftb.mods.ftblibrary.ui.IScreenWrapper;
 import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
 import mezz.jei.api.constants.VanillaTypes;
@@ -78,7 +77,7 @@ public class CrossModBridge {
         private static CompletableFuture<Void> translate(String str){
             if(str.isEmpty()) return CompletableFuture.completedFuture(null);
             translationMappings.put(str,"翻译中...");
-            return LLMTranslate.translate(str, GoogleTranslate.ZN_CH).thenAcceptAsync(result -> translationMappings.put(str,result));
+            return XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).thenAcceptAsync(result -> translationMappings.put(str,result));
         }
     }
 }

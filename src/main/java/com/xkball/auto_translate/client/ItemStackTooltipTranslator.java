@@ -1,8 +1,7 @@
 package com.xkball.auto_translate.client;
 
 import com.mojang.datafixers.util.Either;
-import com.xkball.auto_translate.utils.GoogleTranslate;
-import com.xkball.auto_translate.utils.LLMTranslate;
+import com.xkball.auto_translate.XATConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,14 +18,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ItemStackTooltipTranslator {
     
     public static final Map<String,String> translationMappings = new ConcurrentHashMap<>();
-    public static final Set<String> translatedText = ConcurrentHashMap.newKeySet();
     private static final Style DARK_GRAY = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY);
     @Nullable
     private static ItemStack track = null;
@@ -66,12 +63,8 @@ public class ItemStackTooltipTranslator {
             either.ifLeft(text -> {
                 var str = text.getString();
                 if(str.isEmpty()) return;
-                if(translatedText.contains(str)) return;
                 translationMappings.put(str, "翻译中...");
-                LLMTranslate.translate(str, GoogleTranslate.ZN_CH).whenCompleteAsync((result, t) -> {
-                    translationMappings.put(str, result);
-                    translatedText.add(str);
-                });
+                XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).whenCompleteAsync((result, t) -> translationMappings.put(str, result));
             });
         }
     }

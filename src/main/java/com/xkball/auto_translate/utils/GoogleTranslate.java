@@ -3,6 +3,8 @@ package com.xkball.auto_translate.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.mojang.logging.LogUtils;
+import com.xkball.auto_translate.XATConfig;
+import com.xkball.auto_translate.api.ITranslator;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -20,20 +22,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
-public class GoogleTranslate {
+public class GoogleTranslate implements ITranslator {
     
-    //todo 写进配置文件
-    private static final int MAX_RETRIES = 40;
     private static final URI THE_URI = URI.create("https://translate.google.com");
     private static final URI INTERNAL_URI = URI.create("https://translate.google.com/_/TranslateWebserverUi/data/batchexecute");
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final CookieManager cookieManager = new CookieManager();
     private static final AtomicInteger cookieUsed = new AtomicInteger(0);
-    private static final HttpClient CLIENT = createClient();
-    
+    public static volatile HttpClient CLIENT = createClient();
     public static final String ZN_CH = "zh_cn";
     
-    public static CompletableFuture<String> translate(String text, String lang) {
+    public static final GoogleTranslate INSTANCE = new GoogleTranslate();
+    
+    private GoogleTranslate(){}
+    
+    public CompletableFuture<String> translate(String text, String lang) {
         var strArray = text.split("\n");
         var task = CompletableFuture.runAsync(() -> updateCookies(false))
                 .thenApplyAsync((v) -> tryRunTranslate(strArray[0],lang,0));
@@ -66,7 +69,7 @@ public class GoogleTranslate {
     }
     
     private static String tryRunTranslate(String text, String lang, int retries) {
-        if(retries > MAX_RETRIES) {
+        if(retries > XATConfig.MAX_RETRIES) {
             throw new RuntimeException("Network error: exceeded maximum retry times. " + text);
         }
         if(cookieUsed.incrementAndGet() > 30){
@@ -81,18 +84,19 @@ public class GoogleTranslate {
         var resPost = CLIENT.sendAsync(reqPost,HttpResponse.BodyHandlers.ofString());
         return resPost.thenApplyAsync(res -> {
             if(res.statusCode() != 200){
-                LockSupport.parkNanos(100000);
+                LockSupport.parkNanos(200000);
                 return tryRunTranslate(text,lang,retries+1);
             }
             return getTranslateResult(res.body());
         }).join();
     }
     
-    private static HttpClient createClient() {
-        return HttpClient.newBuilder()
-                .proxy(ProxySelector.of(new InetSocketAddress("127.0.0.1",7890)))
-                .cookieHandler(cookieManager)
-                .build();
+    public static HttpClient createClient() {
+        var builder = HttpClient.newBuilder();
+        if(!XATConfig.HTTP_PROXY_HOST.isEmpty()){
+            builder.proxy(ProxySelector.of(new InetSocketAddress(XATConfig.HTTP_PROXY_HOST,XATConfig.HTTP_PROXY_PORT)));
+        }
+        return builder.cookieHandler(cookieManager).build();
     }
     
     public static String getTranslateResult(String str){

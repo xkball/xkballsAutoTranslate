@@ -21,9 +21,7 @@ public class AutoTranslate {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public AutoTranslate(IEventBus modEventBus, ModContainer modContainer) {
-        
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, XATConfig.SPEC);
     }
     
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

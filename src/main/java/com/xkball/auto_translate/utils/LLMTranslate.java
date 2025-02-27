@@ -3,15 +3,20 @@ package com.xkball.auto_translate.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import com.xkball.auto_translate.XATConfig;
+import com.xkball.auto_translate.api.ITranslator;
 import org.slf4j.Logger;
 
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.LockSupport;
 
-public class LLMTranslate {
+public class LLMTranslate implements ITranslator {
     
     private static final String API_KEY = "";
     private static final String SYSTEM_PROMPT = """
@@ -41,7 +46,8 @@ public class LLMTranslate {
             7. **Translate Target**: Translate the user content to Chinese.""";
     private static final String CONTENT_TEMPLE = """
 {
-    "model": "qwen-plus",
+    "model": "%s",
+    %s
     "messages": [
         {
             "role": "system",
@@ -51,40 +57,60 @@ public class LLMTranslate {
             "role": "user",
             "content": "%s"
         }
-    ],
-    "temperature": 0.1
+    ]
 }
 """;
-    private static final URI THE_URI = URI.create("https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions");
-    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    
+    public static volatile HttpClient CLIENT = createClient();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new Gson();
     
-    public static CompletableFuture<String> translate(String text,/*todo[xkball]*/ String lang){
-        return CompletableFuture.supplyAsync(() -> {
-            var postContent = CONTENT_TEMPLE.formatted(SYSTEM_PROMPT,text);
-            postContent = postContent.replace('\n',' ');
-            var reqPost = HttpRequest.newBuilder(THE_URI)
-                    .header("Authorization","Bearer "+API_KEY)
-                    .header("Content-Type","application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(postContent))
-                    .build();
-            return CLIENT.sendAsync(reqPost, HttpResponse.BodyHandlers.ofString()).thenApplyAsync(
-                    res -> {
-                        if(res.statusCode() != 200){
-                            throw new RuntimeException();
-                        }
-                        var jsonObj1 = GSON.fromJson(res.body(), JsonObject.class);
-                        var jsonArray1 = jsonObj1.getAsJsonArray("choices");
-                        var jsonObj2 = jsonArray1.get(0).getAsJsonObject();
-                        var jsonObj3 = jsonObj2.getAsJsonObject("message");
-                        return jsonObj3.get("content").getAsString();
-                    }
-            ).join();
-            
-        }).exceptionallyAsync(t -> {
+    public static final LLMTranslate INSTANCE = new LLMTranslate();
+    
+    private LLMTranslate() {}
+    
+    public CompletableFuture<String> translate(String text, String lang){
+        return CompletableFuture.supplyAsync(() -> tryRunTranslate(text,lang,0)).exceptionallyAsync(t -> {
             LOGGER.error("Network error",t);
             return "Net work error.Cannot translate the text.";
         });
+    }
+    
+    private static String tryRunTranslate(String text, String lang, int retries){
+        if(retries > XATConfig.MAX_RETRIES){
+            throw new RuntimeException("Network error: exceeded maximum retry times. " + text);
+        }
+        var postContent = CONTENT_TEMPLE.formatted(XATConfig.LLM_MODEL,XATConfig.LLM_MODEL_CONFIGURATION,XATConfig.LLM_SYSTEM_PROMPT.formatted(lang),text);
+        postContent = postContent.replace('\n',' ');
+        var reqPost = HttpRequest.newBuilder(URI.create(XATConfig.LLM_API_URL))
+                .header("Authorization","Bearer "+XATConfig.LLM_API_KEY)
+                .header("Content-Type","application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(postContent))
+                .build();
+        return CLIENT.sendAsync(reqPost, HttpResponse.BodyHandlers.ofString()).thenApplyAsync(
+                res -> {
+                    if(res.statusCode() != 200){
+                        LockSupport.parkNanos(200000);
+                        return tryRunTranslate(res.body(), lang, retries+1);
+                    }
+                    return getTranslateResult(res.body());
+                }
+        ).join();
+    }
+    
+    public static String getTranslateResult(String str){
+        var jsonObj1 = GSON.fromJson(str, JsonObject.class);
+        var jsonArray1 = jsonObj1.getAsJsonArray("choices");
+        var jsonObj2 = jsonArray1.get(0).getAsJsonObject();
+        var jsonObj3 = jsonObj2.getAsJsonObject("message");
+        return jsonObj3.get("content").getAsString();
+    }
+    
+    public static HttpClient createClient() {
+        var builder = HttpClient.newBuilder();
+        if(!XATConfig.HTTP_PROXY_HOST.isEmpty()){
+            builder.proxy(ProxySelector.of(new InetSocketAddress(XATConfig.HTTP_PROXY_HOST,XATConfig.HTTP_PROXY_PORT)));
+        }
+        return builder.build();
     }
 }
