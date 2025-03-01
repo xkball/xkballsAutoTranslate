@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Mixin(Quest.class)
+@Mixin(value = Quest.class, remap = false)
 public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExtension {
     
     @Shadow private Component cachedSubtitle;
@@ -45,7 +45,7 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
         if(cachedDescription == null) return;
         var list = cir.getReturnValue();
         if(list.isEmpty()) return;
-        var last = list.getLast();
+        var last = list.get(list.size()-1);
         list.set(list.size() - 1, Pair.of(last.getFirst(), cachedDescription.size()-1));
     }
     
@@ -97,18 +97,18 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
     
     @Unique
     public List<Component> xkball_sAutoTranslate$getDescriptionUnmodified(){
-        return this.getRawDescription().stream().map((str) -> TextUtils.parseRawText(str, this.holderLookup())).toList();
+        return this.getRawDescription().stream().map(TextUtils::parseRawText).toList();
     }
     
     @Unique
     public Component xkball_sAutoTranslate$getSubtitleUnmodified(){
-        return TextUtils.parseRawText(this.getRawSubtitle(), this.holderLookup());
+        return TextUtils.parseRawText(this.getRawSubtitle());
     }
     
     @Unique
     public Component xkball_sAutoTranslate$getTitleUnmodified(){
         if (!this.getRawTitle().isEmpty()) {
-            return TextUtils.parseRawText(this.getRawTitle(), this.holderLookup());
+            return TextUtils.parseRawText(this.getRawTitle());
         } else {
             return this.getAltTitle();
         }

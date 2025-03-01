@@ -8,8 +8,8 @@ import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
 import mezz.jei.api.constants.VanillaTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nullable;
 import java.util.Map;

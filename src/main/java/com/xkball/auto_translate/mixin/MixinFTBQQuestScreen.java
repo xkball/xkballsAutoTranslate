@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
-@Mixin(QuestScreen.class)
+@Mixin(value = QuestScreen.class,remap = false)
 public abstract class MixinFTBQQuestScreen extends BaseScreen implements IXATQuestScreenExtension {
     
     @Unique

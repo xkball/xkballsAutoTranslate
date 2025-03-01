@@ -42,7 +42,7 @@ public class GoogleTranslate implements ITranslator {
         var strList = Arrays.stream(strArray).filter(s -> !s.isEmpty()).toList();
         if (strList.isEmpty()) return CompletableFuture.completedFuture("");
         var task = CompletableFuture.runAsync(() -> updateCookies(false))
-                .thenApplyAsync((v) -> tryRunTranslate(strList.getFirst(),lang,0));
+                .thenApplyAsync((v) -> tryRunTranslate(strList.get(0),lang,0));
         for(var i = 1; i < strList.size(); i++) {
             int finalI = i;
             task = task.thenApplyAsync(str -> str + "\n" + tryRunTranslate(strList.get(finalI),lang,0));

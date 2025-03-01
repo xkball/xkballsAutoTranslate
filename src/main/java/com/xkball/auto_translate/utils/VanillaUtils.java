@@ -1,9 +1,6 @@
 package com.xkball.auto_translate.utils;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.xkball.auto_translate.AutoTranslate;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -11,14 +8,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec2;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.codec.binary.Base64;
 
 import java.security.MessageDigest;
@@ -46,16 +39,6 @@ public class VanillaUtils {
     
     public static EquipmentSlot equipmentSlotFromHand(InteractionHand hand) {
         return hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-    }
-    
-    public static ItemInteractionResult itemInteractionFrom(InteractionResult result) {
-        return switch (result) {
-            case SUCCESS, SUCCESS_NO_ITEM_USED -> ItemInteractionResult.SUCCESS;
-            case CONSUME -> ItemInteractionResult.CONSUME;
-            case CONSUME_PARTIAL -> ItemInteractionResult.CONSUME_PARTIAL;
-            case PASS -> ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-            case FAIL -> ItemInteractionResult.FAIL;
-        };
     }
     
     public static void runCommand(String command, LivingEntity livingEntity) {
@@ -178,19 +161,4 @@ public class VanillaUtils {
         return startWithList;
     }
     
-    public static class ClientHandler {
-        
-        @OnlyIn(Dist.CLIENT)
-        public static void renderAxis(MultiBufferSource bufferSource, PoseStack poseStack) {
-            var buffer = bufferSource.getBuffer(RenderType.debugLineStrip(8));
-            var matrix = poseStack.last();
-            buffer.addVertex(matrix, 0, 0, 0).setNormal(matrix, -1, 0, 0).setColor(0xFFFF0000);
-            buffer.addVertex(matrix, 100, 0, 0).setNormal(matrix, 1, 0, 0).setColor(0xFFFF0000);
-            buffer.addVertex(matrix, 0, 0, 0).setNormal(matrix, 0, -1, 0).setColor(0xFF00FF00);
-            buffer.addVertex(matrix, 0, 100, 0).setNormal(matrix, 0, 1, 0).setColor(0xFF00FF00);
-            buffer.addVertex(matrix, 0, 0, 0).setNormal(matrix, 0, 0, -1).setColor(0xFF0000FF);
-            buffer.addVertex(matrix, 0, 0, 100).setNormal(matrix, 0, 0, 1).setColor(0xFF0000FF);
-        }
-        
-    }
 }
