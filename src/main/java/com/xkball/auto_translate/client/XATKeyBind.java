@@ -30,9 +30,9 @@ public class XATKeyBind {
             if(!markItemNextFrame) return;
             markItemNextFrame = false;
             if(event.getScreen() instanceof AbstractContainerScreen<?> acs && acs.hoveredSlot != null){
-                ItemStackTooltipTranslator.submit(acs.hoveredSlot.getItem(),event.getGuiGraphics());
+                ItemStackTooltipTranslator.submit(acs.hoveredSlot.getItem(),event.getScreen());
             }
-            ItemStackTooltipTranslator.submit(CrossModBridge.getHoverItemOnJEIOverlay(),event.getGuiGraphics());
+            ItemStackTooltipTranslator.submit(CrossModBridge.getHoverItemOnJEIOverlay(),event.getScreen());
             CrossModBridge.tryTranslateFTBQuest(event);
         }
         

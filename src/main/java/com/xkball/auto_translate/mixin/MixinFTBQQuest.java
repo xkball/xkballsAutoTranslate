@@ -1,6 +1,5 @@
 package com.xkball.auto_translate.mixin;
 
-import com.mojang.datafixers.util.Pair;
 import com.xkball.auto_translate.api.IXATQuestExtension;
 import com.xkball.auto_translate.crossmod.CrossModBridge;
 import dev.ftb.mods.ftbquests.quest.Quest;
@@ -8,6 +7,7 @@ import dev.ftb.mods.ftbquests.quest.QuestObject;
 import dev.ftb.mods.ftbquests.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,19 +16,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 @Mixin(value = Quest.class, remap = false)
 public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExtension {
     
     @Shadow private Component cachedSubtitle;
-    @Shadow private List<Component> cachedDescription;
     
-    @Shadow public abstract List<String> getRawDescription();
-    
-    @Shadow public abstract String getRawSubtitle();
-    
+    @Shadow public double y;
+    @Shadow public String subtitle;
+    @Shadow private Component[] cachedDescription;
+    @Shadow @Final public List<String> description;
     @Unique
     private volatile boolean xkball_sAutoTranslate$invalidedTitleCache = false;
     @Unique
@@ -36,18 +35,11 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
     @Unique
     private volatile boolean xkball_sAutoTranslate$invalidedDescriptionCache = false;
     
-    private MixinFTBQQuest(long id) {
-        super(id);
+    private MixinFTBQQuest() {
+        super();
     }
     
-    @Inject(method = "buildDescriptionIndex",at = @At("RETURN"))
-    public void onBuildPageIndex(CallbackInfoReturnable<List<Pair<Integer, Integer>>> cir){
-        if(cachedDescription == null) return;
-        var list = cir.getReturnValue();
-        if(list.isEmpty()) return;
-        var last = list.get(list.size()-1);
-        list.set(list.size() - 1, Pair.of(last.getFirst(), cachedDescription.size()-1));
-    }
+
     
     @Inject(method = "getSubtitle",at = @At("HEAD"))
     public void beforeGetSubtitle(CallbackInfoReturnable<Component> cir){
@@ -85,35 +77,40 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
         if(this.xkball_sAutoTranslate$isInvalidDescriptionCache()){
             this.xkball_sAutoTranslate$setValidDescriptionCache(false);
             assert cachedDescription != null;
-            var list = new ArrayList<>(cachedDescription);
+            var list = new ArrayList<>(Arrays.stream(cachedDescription).toList());
             list.add(Component.empty());
             for(var component : cachedDescription){
                 var translation = CrossModBridge.FTBQHandler.translationMappings.get(component.getString());
                 if(translation != null) list.add(Component.literal(translation).withStyle(component.getStyle()));
             }
-            cachedDescription = Collections.unmodifiableList(list);
+            cachedDescription = list.toArray(Component[]::new);
         }
     }
     
     @Unique
     public List<Component> xkball_sAutoTranslate$getDescriptionUnmodified(){
-        return this.getRawDescription().stream().map(TextUtils::parseRawText).toList();
+        return this.description.stream().map(TextUtils::parseRawText).toList();
     }
     
     @Unique
     public Component xkball_sAutoTranslate$getSubtitleUnmodified(){
-        return TextUtils.parseRawText(this.getRawSubtitle());
+        return TextUtils.parseRawText(this.subtitle);
     }
     
     @Unique
     public Component xkball_sAutoTranslate$getTitleUnmodified(){
-        if (!this.getRawTitle().isEmpty()) {
-            return TextUtils.parseRawText(this.getRawTitle());
+        if (!this.title.isEmpty()) {
+            return TextUtils.parseRawText(this.title);
         } else {
             return this.getAltTitle();
         }
     }
     
+    @Override
+    public List<Component> xkball_sAutoTranslate$getDescriptionCached() {
+        if(cachedDescription == null) return List.of();
+        return Arrays.stream(cachedDescription).toList();
+    }
     
     @Override
     public void xkball_sAutoTranslate$invalidTitleCache() {

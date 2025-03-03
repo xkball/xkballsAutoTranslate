@@ -1,16 +1,11 @@
 package com.xkball.auto_translate.utils;
 
 import com.xkball.auto_translate.AutoTranslate;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.codec.binary.Base64;
 
@@ -39,15 +34,6 @@ public class VanillaUtils {
     
     public static EquipmentSlot equipmentSlotFromHand(InteractionHand hand) {
         return hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-    }
-    
-    public static void runCommand(String command, LivingEntity livingEntity) {
-        // Raise permission level to 2, akin to what vanilla sign does
-        CommandSourceStack cmdSrc = livingEntity.createCommandSourceStack().withPermission(2);
-        var server = livingEntity.level().getServer();
-        if (server != null) {
-            server.getCommands().performPrefixedCommand(cmdSrc, command);
-        }
     }
     
     public static void runCommand(String command, MinecraftServer server, UUID playerUUID) {
@@ -98,11 +84,6 @@ public class VanillaUtils {
         if (times == 1) return new Vec2(16 - y, x);
         if (times == 2) return new Vec2(16 - x, 16 - y);
         return new Vec2(y, 16 - x);
-    }
-    
-    public static Component getName(Block block) {
-        ResourceLocation rl = BuiltInRegistries.BLOCK.getKey(block);
-        return Component.translatable("block." + rl.getNamespace() + "." + rl.getPath());
     }
     
     public static String md5(String input) {

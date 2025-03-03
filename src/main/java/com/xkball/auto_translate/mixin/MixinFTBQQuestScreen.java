@@ -2,8 +2,8 @@ package com.xkball.auto_translate.mixin;
 
 import com.xkball.auto_translate.api.IXATQuestScreenExtension;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
-import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
-import dev.ftb.mods.ftbquests.client.gui.quests.ViewQuestPanel;
+import dev.ftb.mods.ftbquests.gui.quests.QuestScreen;
+import dev.ftb.mods.ftbquests.gui.quests.ViewQuestPanel;
 import dev.ftb.mods.ftbquests.quest.Quest;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -32,8 +32,6 @@ public abstract class MixinFTBQQuestScreen extends BaseScreen implements IXATQue
             throw new RuntimeException(e);
         }
     }
-    
-    @Shadow public abstract void refreshViewQuestPanel();
     
     @Shadow @Final public ViewQuestPanel viewQuestPanel;
     
@@ -66,7 +64,7 @@ public abstract class MixinFTBQQuestScreen extends BaseScreen implements IXATQue
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
-            refreshViewQuestPanel();
+            this.viewQuestPanel.refreshWidgets();
         }
     }
 }

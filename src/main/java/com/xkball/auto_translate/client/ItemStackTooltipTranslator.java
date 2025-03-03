@@ -1,10 +1,11 @@
 package com.xkball.auto_translate.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.xkball.auto_translate.XATConfig;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -25,22 +26,15 @@ public class ItemStackTooltipTranslator {
     
     public static final Map<String,String> translationMappings = new ConcurrentHashMap<>();
     private static final Style DARK_GRAY = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY);
-    @Nullable
-    private static ItemStack track = null;
     
-    public static void submit(@Nullable ItemStack stack, GuiGraphics graphics) {
+    public static void submit(@Nullable ItemStack stack, Screen graphics) {
         if (stack == null) return;
         if(stack.isEmpty()) return;
-        track = stack;
-        graphics.renderTooltip(Minecraft.getInstance().font, stack, 0, 0);
-        track = null;
+        submit(graphics.getTooltipFromItem(stack));
     }
     
     @SubscribeEvent
     public static void onGatherTooltip(RenderTooltipEvent.GatherComponents event){
-        if(event.getItemStack().equals(track)) {
-            submit(event.getTooltipElements());
-        }
         var newTooltips = new ArrayList<Either<FormattedText, TooltipComponent>>();
         for(var either : event.getTooltipElements()) {
             either.ifLeft(text ->{
@@ -58,14 +52,12 @@ public class ItemStackTooltipTranslator {
         event.getTooltipElements().addAll(newTooltips);
     }
     
-    private static void submit(List<Either<FormattedText, TooltipComponent>> components){
-        for(var either : components) {
-            either.ifLeft(text -> {
-                var str = text.getString();
-                if(str.isEmpty()) return;
-                translationMappings.put(str, "翻译中...");
-                XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).whenCompleteAsync((result, t) -> translationMappings.put(str, result));
-            });
+    private static void submit(List<Component> components){
+        for(var c : components) {
+            var str = c.getString();
+            if(str.isEmpty()) return;
+            translationMappings.put(str, "翻译中...");
+            XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).whenCompleteAsync((result, t) -> translationMappings.put(str, result));
         }
     }
 }

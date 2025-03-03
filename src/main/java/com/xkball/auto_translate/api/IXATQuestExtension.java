@@ -20,6 +20,8 @@ public interface IXATQuestExtension {
     Component xkball_sAutoTranslate$getSubtitleUnmodified();
     List<Component> xkball_sAutoTranslate$getDescriptionUnmodified();
     
+    List<Component> xkball_sAutoTranslate$getDescriptionCached();
+    
     void xkball_sAutoTranslate$invalidTitleCache();
     void xkball_sAutoTranslate$invalidSubtitleCache();
     void xkball_sAutoTranslate$invalidDescriptionCache();

@@ -4,7 +4,7 @@ import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.IXATQuestExtension;
 import com.xkball.auto_translate.api.IXATQuestScreenExtension;
 import dev.ftb.mods.ftblibrary.ui.IScreenWrapper;
-import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
+import dev.ftb.mods.ftbquests.gui.quests.QuestScreen;
 import mezz.jei.api.constants.VanillaTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
