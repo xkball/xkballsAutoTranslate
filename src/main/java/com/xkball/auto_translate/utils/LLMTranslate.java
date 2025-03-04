@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
+import net.minecraft.client.resources.language.I18n;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -61,6 +62,7 @@ public class LLMTranslate implements ITranslator {
                 ]
             }
             """;
+    private static final String INVALID_CONFIG_KEY = "xkball.translator.invalid_config_key";
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new Gson();
     public static volatile HttpClient CLIENT = createClient();
@@ -115,7 +117,7 @@ public class LLMTranslate implements ITranslator {
             return jsonObj3.get("content").getAsString();
         } catch (Exception e) {
             LOGGER.error("Fail to parse translate result: {}", str, e);
-            return ERROR_RESULT;
+            return I18n.get(ERROR_RESULT_KEY);
         }
     }
     
@@ -129,10 +131,10 @@ public class LLMTranslate implements ITranslator {
     
     public CompletableFuture<String> translate(String text, String lang) {
         LOGGER.debug(text);
-        if (!validLLMConfig()) return CompletableFuture.completedFuture("Invalid llm settings!");
+        if (!validLLMConfig()) return CompletableFuture.completedFuture(I18n.get(INVALID_CONFIG_KEY));
         return CompletableFuture.supplyAsync(() -> tryRunTranslate(text, lang, 0)).exceptionallyAsync(t -> {
             LOGGER.error("Network error", t);
-            return "Net work error.Cannot translate the text.";
+            return I18n.get(ERROR_RESULT_KEY);
         });
     }
 }
