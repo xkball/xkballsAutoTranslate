@@ -1,13 +1,14 @@
 package com.xkball.auto_translate.utils;
 
 import com.xkball.auto_translate.api.ITranslator;
+import net.minecraft.client.resources.language.I18n;
 
 import java.util.concurrent.CompletableFuture;
 
 public enum TranslatorType {
     GOOGLE(GoogleTranslate.INSTANCE),
     LLM(LLMTranslate.INSTANCE),
-    DEFAULT((s,l) -> CompletableFuture.completedFuture("You didn't choose any translator.Please edit the config file!!!"));
+    DEFAULT((s,l) -> CompletableFuture.completedFuture(I18n.get(ITranslator.DEFAULT_TRANSLATOR_KEY)));
     
     private final ITranslator translator;
     

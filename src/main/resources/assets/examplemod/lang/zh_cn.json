@@ -1,0 +1,7 @@
+{
+  "xkball.translator.translating": "翻译中...",
+  "xkball.translator.error": "网络错误,无法翻译内容",
+  "xkball.translator.invalid_config_key": "无效的大语言模型配置!",
+  "xkball.translator.default_result": "未设置任何可用翻译器,请修改配置文件!!!",
+  "keys.xkball_s_auto_translate.translate": "按下以翻译"
+}

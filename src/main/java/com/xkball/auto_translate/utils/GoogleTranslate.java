@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
+import net.minecraft.client.resources.language.I18n;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class GoogleTranslate implements ITranslator {
         }
         task.exceptionallyAsync(t -> {
             LOGGER.error("Network error",t);
-            return ERROR_RESULT;
+            return I18n.get(ERROR_RESULT_KEY);
         });
         return task;
     }
@@ -118,7 +119,7 @@ public class GoogleTranslate implements ITranslator {
             return array8.get(0).getAsString();
         } catch (Exception e){
             LOGGER.error("Fail to parse translate result: {}",str,e);
-            return ERROR_RESULT;
+            return I18n.get(ERROR_RESULT_KEY);
         }
     }
 }
