@@ -3,8 +3,10 @@ package com.xkball.auto_translate.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.xkball.auto_translate.XATConfig;
+import com.xkball.auto_translate.api.ITranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -56,7 +58,7 @@ public class ItemStackTooltipTranslator {
         for(var c : components) {
             var str = c.getString();
             if(str.isEmpty()) return;
-            translationMappings.put(str, "翻译中...");
+            translationMappings.put(str, I18n.get(ITranslator.TRANSLATING_KEY));
             XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).whenCompleteAsync((result, t) -> translationMappings.put(str, result));
         }
     }
