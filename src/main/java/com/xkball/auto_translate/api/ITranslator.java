@@ -6,7 +6,9 @@ import java.util.concurrent.CompletableFuture;
 
 public interface ITranslator {
     
-    String ERROR_RESULT = "Net work error.Cannot translate the text.";
+    String DEFAULT_TRANSLATOR_KEY = "xkball.translator.default_result";
+    String TRANSLATING_KEY = "xkball.translator.translating";
+    String ERROR_RESULT_KEY = "xkball.translator.error";
     
     CompletableFuture<String> translate(String text, String lang);
     
