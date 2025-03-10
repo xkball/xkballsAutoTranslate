@@ -1,3 +1,7 @@
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 plugins {
     id 'eclipse'
     id 'idea'
@@ -166,6 +170,15 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+base {
+    archivesName = mod_id
+    if(System.env.GITHUB_ACTIONS && System.env.NIGHTLY_BUILD){
+        var endfix = System.env.VERSION_IDENTIFIER + "-" + LocalDateTime.now(ZoneOffset.ofHours(8)).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(':','-')
+        archivesName="${archivesName.get()}-${version}-${endfix}-nightly"
+        version=''
+    }
 }
 
 jar{

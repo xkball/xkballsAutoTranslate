@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
 import net.minecraft.client.resources.language.I18n;
+import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -14,6 +15,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.LockSupport;
 
@@ -46,18 +48,18 @@ public class LLMTranslate implements ITranslator {
             6. **Input and Output Format**: User Content only contains texts need translate.If translation is unnecessary (e.g. proper nouns, codes, etc.), return the original text. You should output the translation **ONLY**.NO explanations. NO notes.
             
             7. **Translate Target**: Translate the user content to Chinese.""";
-    private static final String CONTENT_TEMPLE = """
+    public static final String CONTENT_TEMPLE = """
             {
-                "model": "%s",
-                %s
+                "model": "${model}",
+                ${modelConfig}
                 "messages": [
                     {
                         "role": "system",
-                        "content": "%s"
+                        "content": "${systemPrompt}"
                     },
                     {
                         "role": "user",
-                        "content": "%s"
+                        "content": "${content}"
                     }
                 ]
             }
@@ -81,7 +83,9 @@ public class LLMTranslate implements ITranslator {
     }
     
     private static HttpRequest createPostRequest(String text, String lang) {
-        var postContent = CONTENT_TEMPLE.formatted(XATConfig.LLM_MODEL, XATConfig.LLM_MODEL_CONFIGURATION, XATConfig.LLM_SYSTEM_PROMPT.formatted(lang), text);
+        var systemPrompt = StrSubstitutor.replace(XATConfig.LLM_SYSTEM_PROMPT,Map.of("targetLanguage", lang));
+        var postContent = StrSubstitutor.replace(XATConfig.LLM_POST_CONTENT, Map.of("model",XATConfig.LLM_MODEL,"modelConfig",XATConfig.LLM_MODEL_CONFIGURATION,"systemPrompt",systemPrompt,"content",text));
+//        var postContent = CONTENT_TEMPLE.formatted(XATConfig.LLM_MODEL, XATConfig.LLM_MODEL_CONFIGURATION, XATConfig.LLM_SYSTEM_PROMPT.formatted(lang), text);
         postContent = postContent.replace('\n', ' ');
         var builder = HttpRequest.newBuilder(URI.create(XATConfig.LLM_API_URL));
         if (!XATConfig.LLM_API_KEY.isEmpty()) {
