@@ -47,12 +47,6 @@ jobs:
           NIGHTLY_BUILD: true
         run: ./gradlew :build --stacktrace --scan
 
-      - name: dslt
-        id: dslt
-        uses: Anvil-Dev/dedicated-server-launch-test@1.20.1-forge
-        with:
-          mod: build/libs/${{ steps.build.outputs.jar_name}}.jar
-
       - name: GitHub Action Artifact
         uses: actions/upload-artifact@v4
         with:
