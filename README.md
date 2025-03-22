@@ -18,7 +18,9 @@ Now this mod have three translators:
 
 ## Demonstrate  效果展示
 
+![Translate Item Tooltip](https://github.com/xkball/xkballsAutoTranslate/blob/master/2025-02-28_19.24.23.png)
 
+![Translate FTB Quest](https://github.com/xkball/xkballsAutoTranslate/blob/master/2025-02-28_19.25.29.png)
 
 ## Some Explanation 一些说明
 
