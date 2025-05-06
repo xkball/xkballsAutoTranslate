@@ -28,8 +28,9 @@ public class VanillaUtils {
         return rLOf(AutoTranslate.MODID, path);
     }
     
+    @SuppressWarnings("removal")
     public static ResourceLocation rLOf(String namespace, String path) {
-        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+        return new ResourceLocation(namespace, path);
     }
     
     public static EquipmentSlot equipmentSlotFromHand(InteractionHand hand) {
