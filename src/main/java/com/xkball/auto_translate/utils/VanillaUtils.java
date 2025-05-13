@@ -20,7 +20,8 @@ import java.util.UUID;
 public class VanillaUtils {
     
     public static final Direction[] DIRECTIONS = Direction.values();
-    public static final ResourceLocation MISSING_TEXTURE = ResourceLocation.withDefaultNamespace("missingno");
+    @SuppressWarnings("removal")
+    public static final ResourceLocation MISSING_TEXTURE = new ResourceLocation("missingno");
     public static final int TRANSPARENT = VanillaUtils.getColor(255, 255, 255, 0);
     public static final int GUI_GRAY = VanillaUtils.getColor(30, 30, 30, 200);
     
