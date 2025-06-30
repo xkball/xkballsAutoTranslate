@@ -6,9 +6,6 @@
   "mixins": [
   ],
   "client": [
-    "MixinFTBQQuest",
-    "MixinFTBQQuestObjectBase",
-    "MixinFTBQQuestScreen"
   ],
   "injectors": {
     "defaultRequire": 1

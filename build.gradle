@@ -63,8 +63,8 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
-        data {
-            data()
+        clientData {
+            clientData()
 
             // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
             // gameDirectory = project.file('run-data')
@@ -141,14 +141,14 @@ dependencies {
     compileOnly "mezz.jei:jei-${mc_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
 
-    //https://www.curseforge.com/minecraft/mc-mods/ftb-teams-forge
-    implementation "curse.maven:ftb-teams-forge-404468:6119437"
-    //https://www.curseforge.com/minecraft/mc-mods/architectury-api
-    implementation "curse.maven:architectury-api-419699:5553800"
-    //https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge
-    implementation "curse.maven:ftb-library-forge-404465:6229316"
-    //https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge
-    implementation "curse.maven:ftb-quests-neoforge-289412:6167037"
+//    //https://www.curseforge.com/minecraft/mc-mods/ftb-teams-forge
+//    implementation "curse.maven:ftb-teams-forge-404468:6119437"
+//    //https://www.curseforge.com/minecraft/mc-mods/architectury-api
+//    implementation "curse.maven:architectury-api-419699:5553800"
+//    //https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge
+//    implementation "curse.maven:ftb-library-forge-404465:6229316"
+//    //https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge
+//    implementation "curse.maven:ftb-quests-neoforge-289412:6167037"
 
 
     // For more info:

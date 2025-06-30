@@ -10,9 +10,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Block;
@@ -48,21 +47,12 @@ public class VanillaUtils {
         return hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
     }
     
-    public static ItemInteractionResult itemInteractionFrom(InteractionResult result) {
-        return switch (result) {
-            case SUCCESS, SUCCESS_NO_ITEM_USED -> ItemInteractionResult.SUCCESS;
-            case CONSUME -> ItemInteractionResult.CONSUME;
-            case CONSUME_PARTIAL -> ItemInteractionResult.CONSUME_PARTIAL;
-            case PASS -> ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-            case FAIL -> ItemInteractionResult.FAIL;
-        };
-    }
-    
     public static void runCommand(String command, LivingEntity livingEntity) {
         // Raise permission level to 2, akin to what vanilla sign does
-        CommandSourceStack cmdSrc = livingEntity.createCommandSourceStack().withPermission(2);
+        var level = livingEntity.level();
         var server = livingEntity.level().getServer();
-        if (server != null) {
+        if (server != null && level instanceof ServerLevel serverLevel) {
+            CommandSourceStack cmdSrc = livingEntity.createCommandSourceStackForNameResolution(serverLevel).withPermission(2);
             server.getCommands().performPrefixedCommand(cmdSrc, command);
         }
     }
