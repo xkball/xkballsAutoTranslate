@@ -1,7 +1,6 @@
 package com.xkball.auto_translate;
 
-import com.xkball.auto_translate.utils.GoogleTranslate;
-import com.xkball.auto_translate.utils.LLMTranslate;
+import com.xkball.auto_translate.event.XATConfigUpdateEvent;
 import com.xkball.auto_translate.utils.TranslatorType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,7 +18,7 @@ public class XATConfig {
     public static String LLM_API_URL = "";
     public static String LLM_API_KEY = "";
     public static String LLM_MODEL = "";
-    public static String LLM_POST_CONTENT = "";
+//    public static String LLM_POST_CONTENT = "";
     public static String LLM_SYSTEM_PROMPT = "";
     public static String LLM_MODEL_CONFIGURATION = "";
     
@@ -41,20 +40,39 @@ public class XATConfig {
     static final ForgeConfigSpec SPEC = BUILDER.build();
     
     public static void update(){
+        var hostOld = HTTP_PROXY_HOST;
         HTTP_PROXY_HOST = HTTP_PROXY_HOST_CONFIG.get();
+        
+        var portOld = HTTP_PROXY_PORT;
         HTTP_PROXY_PORT = HTTP_PROXY_PORT_CONFIG.get();
+        
+        var maxRetriesOld = MAX_RETRIES;
         MAX_RETRIES = MAX_RETRIES_CONFIG.get();
+        
         TARGET_LANGUAGE = TARGET_LANGUAGE_CONFIG.get();
         TRANSLATOR_TYPE = TRANSLATOR_TYPE_CONFIG.get();
+        
+        var llmApiUrlOld = LLM_API_URL;
         LLM_API_URL = LLM_API_URL_CONFIG.get();
+        
+        var llmApiKeyOld = LLM_API_KEY;
         LLM_API_KEY = LLM_API_KEY_CONFIG.get();
+        
+        var llmModelOld = LLM_MODEL;
         LLM_MODEL = LLM_MODEL_CONFIG.get();
-        LLM_POST_CONTENT = LLM_POST_CONTENT_CONFIG.get();
+        //        LLM_POST_CONTENT = LLM_POST_CONTENT_CONFIG.get();
+        
+        var llmSystemPromptOld = LLM_SYSTEM_PROMPT;
         LLM_SYSTEM_PROMPT = LLM_SYSTEM_PROMPT_CONFIG.get();
+        
         LLM_MODEL_CONFIGURATION = LLM_MODEL_CONFIGURATION_CONFIG.get();
         
-        GoogleTranslate.CLIENT = GoogleTranslate.createClient();
-        LLMTranslate.CLIENT = LLMTranslate.createClient();
+        var mod = ModList.get().getModContainerById(AutoTranslate.MODID);
+        mod.ifPresent(mod_ -> {
+            var bus = Objects.requireNonNull(mod_.getEventBus());
+            bus.post(new XATConfigUpdateEvent.Http(HTTP_PROXY_HOST,HTTP_PROXY_PORT,hostOld,portOld,MAX_RETRIES, maxRetriesOld));
+            bus.post(new XATConfigUpdateEvent.LLM(LLM_API_URL, llmApiUrlOld, LLM_API_KEY, llmApiKeyOld, LLM_MODEL, llmModelOld, LLM_SYSTEM_PROMPT, llmSystemPromptOld, MAX_RETRIES, maxRetriesOld));
+        });
     }
 
     @SubscribeEvent

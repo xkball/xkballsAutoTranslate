@@ -5,7 +5,10 @@ import com.google.gson.JsonArray;
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
+import com.xkball.auto_translate.event.XATConfigUpdateEvent;
 import net.minecraft.client.resources.language.I18n;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -24,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
+@EventBusSubscriber
 public class GoogleTranslate implements ITranslator {
     
     private static final URI THE_URI = URI.create("https://translate.google.com");
@@ -31,7 +35,7 @@ public class GoogleTranslate implements ITranslator {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final CookieManager cookieManager = new CookieManager();
     private static final AtomicInteger cookieUsed = new AtomicInteger(0);
-    public static volatile HttpClient CLIENT = createClient();
+    private static volatile HttpClient CLIENT = createClient();
     
     public static final GoogleTranslate INSTANCE = new GoogleTranslate();
     
@@ -120,6 +124,13 @@ public class GoogleTranslate implements ITranslator {
         } catch (Exception e){
             LOGGER.error("Fail to parse translate result: {}",str,e);
             return I18n.get(ERROR_RESULT_KEY);
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onUpdateHttpConfig(XATConfigUpdateEvent.Http event){
+        if(event.changed()){
+            GoogleTranslate.CLIENT = createClient();
         }
     }
 }

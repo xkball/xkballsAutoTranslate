@@ -1,28 +1,25 @@
 package com.xkball.auto_translate.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
+import com.xkball.auto_translate.event.XATConfigUpdateEvent;
+import com.xkball.auto_translate.llm.LLMClientImpl;
+import com.xkball.auto_translate.llm.LLMRequest;
+import com.xkball.auto_translate.llm.LLMResponse;
 import net.minecraft.client.resources.language.I18n;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.slf4j.Logger;
 
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.LockSupport;
 
+@EventBusSubscriber
 public class LLMTranslate implements ITranslator {
     
     public static final LLMTranslate INSTANCE = new LLMTranslate();
-    private static final String API_KEY = "";
     private static final String SYSTEM_PROMPT = """
             You are a machine translation engine for Minecraft in-game texts. Your task is to accurately translate Minecraft in-game texts to another language while adhering to the following rules and guidelines:
             
@@ -66,79 +63,41 @@ public class LLMTranslate implements ITranslator {
             """;
     private static final String INVALID_CONFIG_KEY = "xkball.translator.invalid_config_key";
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Gson GSON = new Gson();
-    public static volatile HttpClient CLIENT = createClient();
+    private volatile LLMClientImpl client = createLLMClient();
     
     private LLMTranslate() {
     }
     
-    private static boolean validLLMConfig() {
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            URI.create(XATConfig.LLM_API_URL);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-        return !XATConfig.LLM_MODEL.isEmpty() && !XATConfig.LLM_SYSTEM_PROMPT.isEmpty();
-    }
-    
-    private static HttpRequest createPostRequest(String text, String lang) {
-        var systemPrompt = StrSubstitutor.replace(XATConfig.LLM_SYSTEM_PROMPT,Map.of("targetLanguage", lang));
-        var postContent = StrSubstitutor.replace(XATConfig.LLM_POST_CONTENT, Map.of("model",XATConfig.LLM_MODEL,"modelConfig",XATConfig.LLM_MODEL_CONFIGURATION,"systemPrompt",systemPrompt,"content",text));
-//        var postContent = CONTENT_TEMPLE.formatted(XATConfig.LLM_MODEL, XATConfig.LLM_MODEL_CONFIGURATION, XATConfig.LLM_SYSTEM_PROMPT.formatted(lang), text);
-        postContent = postContent.replace('\n', ' ');
-        var builder = HttpRequest.newBuilder(URI.create(XATConfig.LLM_API_URL));
-        if (!XATConfig.LLM_API_KEY.isEmpty()) {
-            builder.header("Authorization", "Bearer " + XATConfig.LLM_API_KEY);
-        }
-        return builder.header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(postContent))
+    private static LLMClientImpl createLLMClient(){
+        return new LLMClientImpl.Builder()
+                .setUrl(XATConfig.LLM_API_URL)
+                .setApiKey(XATConfig.LLM_API_KEY)
+                .setModel(XATConfig.LLM_MODEL)
+                .setMaxRetries(XATConfig.MAX_RETRIES)
                 .build();
     }
     
-    private static String tryRunTranslate(String text, String lang, int retries) {
-        if (retries > XATConfig.MAX_RETRIES) {
-            throw new RuntimeException("Network error: exceeded maximum retry times. " + text);
-        }
-        var reqPost = createPostRequest(text,lang);
-        return CLIENT.sendAsync(reqPost, HttpResponse.BodyHandlers.ofString()).thenApplyAsync(
-                res -> {
-                    if (res.statusCode() != 200) {
-                        LockSupport.parkNanos(200000);
-                        return tryRunTranslate(res.body(), lang, retries + 1);
-                    }
-                    return getTranslateResult(res.body());
-                }
-        ).join();
-    }
-    
-    public static String getTranslateResult(String str) {
-        try {
-            var jsonObj1 = GSON.fromJson(str, JsonObject.class);
-            var jsonArray1 = jsonObj1.getAsJsonArray("choices");
-            var jsonObj2 = jsonArray1.get(0).getAsJsonObject();
-            var jsonObj3 = jsonObj2.getAsJsonObject("message");
-            return jsonObj3.get("content").getAsString();
-        } catch (Exception e) {
-            LOGGER.error("Fail to parse translate result: {}", str, e);
-            return I18n.get(ERROR_RESULT_KEY);
-        }
-    }
-    
-    public static HttpClient createClient() {
-        var builder = HttpClient.newBuilder();
-        if (!XATConfig.HTTP_PROXY_HOST.isEmpty()) {
-            builder.proxy(ProxySelector.of(new InetSocketAddress(XATConfig.HTTP_PROXY_HOST, XATConfig.HTTP_PROXY_PORT)));
-        }
-        return builder.build();
+    private static LLMRequest createPostRequest(String text, String lang) {
+        var systemPrompt = StrSubstitutor.replace(XATConfig.LLM_SYSTEM_PROMPT,Map.of("targetLanguage", lang));
+        return new LLMRequest(systemPrompt,text);
     }
     
     public CompletableFuture<String> translate(String text, String lang) {
         LOGGER.debug(text);
-        if (!validLLMConfig()) return CompletableFuture.completedFuture(I18n.get(INVALID_CONFIG_KEY));
-        return CompletableFuture.supplyAsync(() -> tryRunTranslate(text, lang, 0)).exceptionallyAsync(t -> {
-            LOGGER.error("Network error", t);
+        //todo: 会阻塞
+//        if (!this.client.valid()) return CompletableFuture.completedFuture(I18n.get(INVALID_CONFIG_KEY));
+        var reqPost = createPostRequest(text,lang);
+        return client.sendAsync(reqPost, LLMResponse::getContent).exceptionallyAsync(t -> {
+            LOGGER.warn("Network error", t);
             return I18n.get(ERROR_RESULT_KEY);
         });
     }
+    
+    @SubscribeEvent
+    public static void onUpdateHttpConfig(XATConfigUpdateEvent.LLM event){
+        if(event.changed()){
+            LLMTranslate.INSTANCE.client = createLLMClient();
+        }
+    }
+    
 }
