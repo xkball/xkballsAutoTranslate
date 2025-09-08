@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class ItemStackTooltipTranslator {
     
     public static final Map<String,String> translationMappings = new ConcurrentHashMap<>();

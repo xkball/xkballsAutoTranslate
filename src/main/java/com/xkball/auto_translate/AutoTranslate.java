@@ -24,7 +24,7 @@ public class AutoTranslate {
         modContainer.registerConfig(ModConfig.Type.COMMON, XATConfig.SPEC);
     }
     
-    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
