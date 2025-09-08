@@ -1,14 +1,18 @@
 package com.xkball.auto_translate;
 
-import com.xkball.auto_translate.utils.GoogleTranslate;
-import com.xkball.auto_translate.utils.LLMTranslate;
+import com.xkball.auto_translate.event.XATConfigUpdateEvent;
 import com.xkball.auto_translate.utils.TranslatorType;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.NeoForge;
 
-@EventBusSubscriber(modid = AutoTranslate.MODID, bus = EventBusSubscriber.Bus.MOD)
+import java.util.Objects;
+
+@EventBusSubscriber(modid = AutoTranslate.MODID)
 public class XATConfig {
     
     public static String HTTP_PROXY_HOST = "";
@@ -19,8 +23,9 @@ public class XATConfig {
     public static String LLM_API_URL = "";
     public static String LLM_API_KEY = "";
     public static String LLM_MODEL = "";
-    public static String LLM_POST_CONTENT = "";
+//    public static String LLM_POST_CONTENT = "";
     public static String LLM_SYSTEM_PROMPT = "";
+    //todo: 改成map
     public static String LLM_MODEL_CONFIGURATION = "";
     
     private static final String DEFAULT_SYSTEM_PROMPT = "Treat user content as plain text input and translate it into ${targetLanguage}, output translation ONLY. If translation is unnecessary (e.g. proper nouns, codes, etc.), return the original text. NO explanations. NO notes.";
@@ -34,27 +39,46 @@ public class XATConfig {
     private static final ModConfigSpec.ConfigValue<String> LLM_API_URL_CONFIG = BUILDER.comment("This mod use OpenAI API.The API endpoint URL for LLM service.Default: \"\"").define("llm_api_url", "");
     private static final ModConfigSpec.ConfigValue<String> LLM_API_KEY_CONFIG = BUILDER.comment("The API key of LLM API.Default: \"\"").define("llm_api_key", "");
     private static final ModConfigSpec.ConfigValue<String> LLM_MODEL_CONFIG = BUILDER.comment("The model to use for translations.Default: \"\"").define("llm_model", "");
-    private static final ModConfigSpec.ConfigValue<String> LLM_POST_CONTENT_CONFIG = BUILDER.comment("The Json post to LLM API.DON'T modify it if you don't know what it is.").define("llm_post_content", LLMTranslate.CONTENT_TEMPLE);
+//    private static final ModConfigSpec.ConfigValue<String> LLM_POST_CONTENT_CONFIG = BUILDER.comment("The Json post to LLM API.DON'T modify it if you don't know what it is.").define("llm_post_content", LLMTranslate.CONTENT_TEMPLE);
     private static final ModConfigSpec.ConfigValue<String> LLM_SYSTEM_PROMPT_CONFIG = BUILDER.comment("The system prompt give to llm.Should contain ${targetLanguage} to replace to target language.Default: " + DEFAULT_SYSTEM_PROMPT).define("llm_system_prompt", DEFAULT_SYSTEM_PROMPT);
     private static final ModConfigSpec.ConfigValue<String> LLM_MODEL_CONFIGURATION_CONFIG = BUILDER.comment("Json Elements to configure llm.The ending should be followed by a comma.Default: \"temperature\": 0,").define("llm_model_configuration", "\"temperature\": 0,");
     
     static final ModConfigSpec SPEC = BUILDER.build();
     
     public static void update(){
+        var hostOld = HTTP_PROXY_HOST;
         HTTP_PROXY_HOST = HTTP_PROXY_HOST_CONFIG.get();
+        
+        var portOld = HTTP_PROXY_PORT;
         HTTP_PROXY_PORT = HTTP_PROXY_PORT_CONFIG.get();
+        
+        var maxRetriesOld = MAX_RETRIES;
         MAX_RETRIES = MAX_RETRIES_CONFIG.get();
+        
         TARGET_LANGUAGE = TARGET_LANGUAGE_CONFIG.get();
         TRANSLATOR_TYPE = TRANSLATOR_TYPE_CONFIG.get();
+        
+        var llmApiUrlOld = LLM_API_URL;
         LLM_API_URL = LLM_API_URL_CONFIG.get();
+        
+        var llmApiKeyOld = LLM_API_KEY;
         LLM_API_KEY = LLM_API_KEY_CONFIG.get();
+        
+        var llmModelOld = LLM_MODEL;
         LLM_MODEL = LLM_MODEL_CONFIG.get();
-        LLM_POST_CONTENT = LLM_POST_CONTENT_CONFIG.get();
+        //        LLM_POST_CONTENT = LLM_POST_CONTENT_CONFIG.get();
+        
+        var llmSystemPromptOld = LLM_SYSTEM_PROMPT;
         LLM_SYSTEM_PROMPT = LLM_SYSTEM_PROMPT_CONFIG.get();
+        
         LLM_MODEL_CONFIGURATION = LLM_MODEL_CONFIGURATION_CONFIG.get();
         
-        GoogleTranslate.CLIENT = GoogleTranslate.createClient();
-        LLMTranslate.CLIENT = LLMTranslate.createClient();
+        var mod = ModList.get().getModContainerById(AutoTranslate.MODID);
+        mod.ifPresent(mod_ -> {
+            var bus = Objects.requireNonNull(mod_.getEventBus());
+            bus.post(new XATConfigUpdateEvent.Http(HTTP_PROXY_HOST,HTTP_PROXY_PORT,hostOld,portOld,MAX_RETRIES, maxRetriesOld));
+            bus.post(new XATConfigUpdateEvent.LLM(LLM_API_URL, llmApiUrlOld, LLM_API_KEY, llmApiKeyOld, LLM_MODEL, llmModelOld, LLM_SYSTEM_PROMPT, llmSystemPromptOld, MAX_RETRIES, maxRetriesOld));
+        });
     }
 
     @SubscribeEvent
