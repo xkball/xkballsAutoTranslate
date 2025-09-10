@@ -3,6 +3,8 @@ package com.xkball.auto_translate.client;
 import com.mojang.datafixers.util.Either;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
+import com.xkball.auto_translate.data.XATDataBase;
+import com.xkball.auto_translate.data.TranslationCacheSlice;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,6 +14,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
@@ -25,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @EventBusSubscriber(value = Dist.CLIENT)
 public class ItemStackTooltipTranslator {
     
-    public static final Map<String,String> translationMappings = new ConcurrentHashMap<>();
+    public static final Map<String,String> translating = new ConcurrentHashMap<>();
+    public static final TranslationCacheSlice tooltipCache = XATDataBase.INSTANCE.createSlice("tooltip");
     private static final Style DARK_GRAY = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY);
     @Nullable
     private static ItemStack track = null;
@@ -38,7 +42,7 @@ public class ItemStackTooltipTranslator {
         track = null;
     }
     
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onGatherTooltip(RenderTooltipEvent.GatherComponents event){
         if(event.getItemStack().equals(track)) {
             submit(event.getTooltipElements());
@@ -49,9 +53,15 @@ public class ItemStackTooltipTranslator {
                         newTooltips.add(either);
                         var str = text.getString();
                         if(str.isEmpty()) return;
-                        var translation = translationMappings.get(str);
-                        if(translation != null) {
-                            newTooltips.add(Either.left(FormattedText.of(translation, DARK_GRAY)));
+                        var translating = ItemStackTooltipTranslator.translating.containsKey(str);
+                        if(translating) {
+                            newTooltips.add(Either.left(FormattedText.of(I18n.get(ITranslator.TRANSLATING_KEY), DARK_GRAY)));
+                        }
+                        else{
+                            var trResult = tooltipCache.get(str);
+                            if(trResult != null) {
+                                newTooltips.add(Either.left(FormattedText.of(trResult, DARK_GRAY)));
+                            }
                         }
             });
             either.ifRight(text -> newTooltips.add(either));
@@ -65,8 +75,11 @@ public class ItemStackTooltipTranslator {
             either.ifLeft(text -> {
                 var str = text.getString();
                 if(str.isEmpty()) return;
-                translationMappings.put(str, I18n.get(ITranslator.TRANSLATING_KEY));
-                XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).whenCompleteAsync((result, t) -> translationMappings.put(str, result));
+                translating.put(str,"");
+                XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).whenCompleteAsync((result, t) -> {
+                    translating.remove(str);
+                    tooltipCache.put(str,result);
+                });
             });
         }
     }

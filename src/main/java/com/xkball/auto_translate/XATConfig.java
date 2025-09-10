@@ -3,12 +3,10 @@ package com.xkball.auto_translate;
 import com.xkball.auto_translate.event.XATConfigUpdateEvent;
 import com.xkball.auto_translate.utils.TranslatorType;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Objects;
 
