@@ -158,7 +158,8 @@ dependencies {
 //    //https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge
 //    implementation "curse.maven:ftb-quests-neoforge-289412:6167037"
 
-    jarJar(mcLib('org.xerial:sqlite-jdbc:3.50.3.0'))
+    jarJar(mcLib("org.xerial:sqlite-jdbc:3.50.3.0"))
+    jarJar(mcLib("org.yaml:snakeyaml:2.3"))
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
