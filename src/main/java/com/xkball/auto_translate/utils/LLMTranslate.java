@@ -63,12 +63,12 @@ public class LLMTranslate implements ITranslator {
             """;
     private static final String INVALID_CONFIG_KEY = "xkball.translator.invalid_config_key";
     private static final Logger LOGGER = LogUtils.getLogger();
-    private volatile LLMClientImpl client = createLLMClient();
+    public volatile LLMClientImpl client = createLLMClient();
     
     private LLMTranslate() {
     }
     
-    private static LLMClientImpl createLLMClient(){
+    public static LLMClientImpl createLLMClient(){
         return new LLMClientImpl.Builder()
                 .setUrl(XATConfig.LLM_API_URL)
                 .setApiKey(XATConfig.LLM_API_KEY)

@@ -40,6 +40,20 @@ public class TranslationCacheSlice {
         }
     }
     
+    public Map<String, String> toMap(){
+        Map<String, String> result = new HashMap<>();
+        String sql = "SELECT key, value FROM " + tableName;
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                result.put(rs.getString("key"), rs.getString("value"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+    
     public static class InMemory extends TranslationCacheSlice {
         
         private final Map<String, String> cache = new HashMap<>();
@@ -56,6 +70,11 @@ public class TranslationCacheSlice {
         @Override
         public String get(String key) {
             return cache.get(key);
+        }
+        
+        @Override
+        public Map<String, String> toMap() {
+            return Map.copyOf(cache);
         }
     }
 }
