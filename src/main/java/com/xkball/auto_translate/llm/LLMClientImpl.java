@@ -3,6 +3,7 @@ package com.xkball.auto_translate.llm;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.event.XATConfigUpdateEvent;
@@ -20,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
@@ -28,14 +30,14 @@ public class LLMClientImpl {
     private static volatile HttpClient CLIENT = HttpHandler.createClient();
     private static final Logger LOGGER = LogUtils.getLogger();
     
+    private final Semaphore semaphore = new Semaphore(4);
     private final String url;
     private final String apiKey;
     private final String model;
     private final int maxRetries;
     private Boolean valid = null;
     
-    private ILLMHandler responseHandler;
-    private final Queue<LLMRequest> requests = new LinkedList<>();
+    private final Queue<Pair<LLMRequest,ILLMHandler>> requests = new LinkedList<>();
     
     protected LLMClientImpl(String url, String apiKey, String model, int maxRetries) {
         this.url = url;
@@ -62,13 +64,9 @@ public class LLMClientImpl {
         return flag;
     }
     
-    public LLMClientImpl responseHandler(ILLMHandler responseHandler) {
-        this.responseHandler = responseHandler;
-        return this;
-    }
-    
-    public LLMClientImpl addRequest(LLMRequest request){
-        this.requests.add(request);
+    @SuppressWarnings("UnusedReturnValue")
+    public LLMClientImpl addRequest(LLMRequest request,ILLMHandler handler){
+        this.requests.add(Pair.of(request,handler));
         return this;
     }
     
@@ -98,33 +96,45 @@ public class LLMClientImpl {
     }
     
     public void send(){
-        if(this.responseHandler == null || !this.valid()) return;
         while(!this.requests.isEmpty()){
             var request = this.requests.poll();
-            this.sendAsyncWithRetry(request,this.responseHandler, 0);
+            this.sendAsyncWithRetry(request.getFirst(),request.getSecond(), 0);
         }
     }
     
     private void sendAsyncWithRetry(LLMRequest req,ILLMHandler handler,int retries){
         if(retries > this.maxRetries){
             LOGGER.warn("LLM Request Exceeded Max Retries: {}", retries);
+            handler.onRetriesExceeded();
         }
         else {
-            LockSupport.parkNanos(200000);
-             sendAsync(req,handler::handle).thenAccept(res -> {
-                if(!res)sendAsyncWithRetry(req,handler,retries+1);
-             });
+            if(retries > 0){
+                LockSupport.parkNanos(2000000);
+            }
+            CompletableFuture.runAsync(semaphore::acquireUninterruptibly)
+                    .thenAccept(ignore -> sendAsync(req,handler::handle)
+                        .thenAccept(res -> {
+                            if(!res)sendAsyncWithRetry(req,handler,retries+1);
+                        }))
+                    .handle((v,ex) -> {
+                        if(ex != null){
+                            LOGGER.error("LLM Request Error", ex);
+                        }
+                        semaphore.release();
+                        return null;
+                    })
+            ;
         }
     }
     
     public <T> CompletableFuture<T> sendAsync(LLMRequest req,Function<LLMResponse, T> overrideHandler){
-        return HttpUtils.sendWithRetry(CLIENT,createHttpRequest(req), 6)
+        return HttpUtils.sendWithRetry(CLIENT,createHttpRequest(req), XATConfig.MAX_RETRIES)
                 .thenApply((response) -> overrideHandler.apply(LLMResponse.fromString(response.body())));
     }
     
     public <T> Either<T,Throwable> sendSync(LLMRequest req, Function<LLMResponse, T> overrideHandler){
         try {
-            var t = HttpUtils.sendWithRetry(CLIENT,createHttpRequest(req), 6)
+            var t = HttpUtils.sendWithRetry(CLIENT,createHttpRequest(req), XATConfig.MAX_RETRIES)
                     .thenApply((response) -> overrideHandler.apply(LLMResponse.fromString(response.body())))
                     .get();
             return Either.left(t);
