@@ -1,7 +1,0 @@
-{
-  "xkball.translator.translating": "Translating......",
-  "xkball.translator.error": "Net work error.Cannot translate the text.",
-  "xkball.translator.invalid_config_key": "Invalid LLM settings!",
-  "xkball.translator.default_result": "You didn't choose any translator.Please edit the config file!!!",
-  "keys.xkball_s_auto_translate.translate": "Press To Translate"
-}
