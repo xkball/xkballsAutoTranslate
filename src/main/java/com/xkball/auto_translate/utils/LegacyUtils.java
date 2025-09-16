@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+
+//向伟大的https://github.com/SihenZhang/AutoTranslator/blob/main/src/main/java/com/sihenzhang/autotranslator/Utils.java前辈致敬!
 public final class LegacyUtils {
     private LegacyUtils() {
     }
