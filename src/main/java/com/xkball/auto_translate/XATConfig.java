@@ -21,8 +21,7 @@ public class XATConfig {
 //    public static String LLM_POST_CONTENT = "";
     public static String LLM_SYSTEM_PROMPT = "";
     //todo: 改成map
-    public static String LLM_MODEL_CONFIGURATION = "";
-    
+//    public static String LLM_MODEL_CONFIGURATION ublic
     private static final String DEFAULT_SYSTEM_PROMPT = "Treat user content as plain text input and translate it into ${targetLanguage}, output translation ONLY. If translation is unnecessary (e.g. proper nouns, codes, etc.), return the original text. NO explanations. NO notes.";
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     
@@ -66,7 +65,7 @@ public class XATConfig {
         var llmSystemPromptOld = LLM_SYSTEM_PROMPT;
         LLM_SYSTEM_PROMPT = LLM_SYSTEM_PROMPT_CONFIG.get();
         
-        LLM_MODEL_CONFIGURATION = LLM_MODEL_CONFIGURATION_CONFIG.get();
+//        LLM_MODEL_CONFIGURATION = LLM_MODEL_CONFIGURATION_CONFIG.get();
         
         var mod = ModList.get().getModContainerById(AutoTranslate.MODID);
         mod.ifPresent(mod_ -> {

@@ -8,7 +8,9 @@
   "client": [
     "MixinFTBQQuest",
     "MixinFTBQQuestObjectBase",
-    "MixinFTBQQuestScreen"
+    "MixinFTBQQuestScreen",
+    "MixinAbstractWidgetAccess",
+    "MixinGuiGraphics"
   ],
   "injectors": {
     "defaultRequire": 1

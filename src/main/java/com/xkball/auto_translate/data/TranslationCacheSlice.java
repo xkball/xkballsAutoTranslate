@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +55,15 @@ public class TranslationCacheSlice {
         return result;
     }
     
+    public void clear(){
+        String sql = "DELETE FROM " + tableName;
+        try (Statement stmt = conn.createStatement()){
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     public static class InMemory extends TranslationCacheSlice {
         
         private final Map<String, String> cache = new HashMap<>();
@@ -75,6 +85,11 @@ public class TranslationCacheSlice {
         @Override
         public Map<String, String> toMap() {
             return Map.copyOf(cache);
+        }
+        
+        @Override
+        public void clear() {
+            cache.clear();
         }
     }
 }
