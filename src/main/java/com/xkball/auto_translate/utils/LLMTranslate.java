@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class LLMTranslate implements ITranslator {
     
     public static final LLMTranslate INSTANCE = new LLMTranslate();
