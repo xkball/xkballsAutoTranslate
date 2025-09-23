@@ -119,6 +119,9 @@ public class XATConfigScreen extends FrameScreen {
     public BaseContainerWidget createRunTransKeys(){
         var btn1 = FrameScreen.createButton("xat.gui.btn.run_trans_keys", this::runTransKeys);
         var btn2 = FrameScreen.createButton("xat.gui.btn.cancel_inject_lang", () -> {
+            contextSize = 0;
+            contextFinished = 0;
+            contextError = 0;
             XATDataBase.INSTANCE.enableInjectLang(false);
             AutoTranslate.cancelInjectLanguage();
             XATConfigScreen.this.setNeedUpdate();

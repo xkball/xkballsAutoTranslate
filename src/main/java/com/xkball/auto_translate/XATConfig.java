@@ -10,7 +10,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Objects;
 
-@EventBusSubscriber(modid = AutoTranslate.MODID)
+@EventBusSubscriber(modid = AutoTranslate.MODID,bus = EventBusSubscriber.Bus.MOD)
 public class XATConfig {
     
     public static String HTTP_PROXY_HOST = "";

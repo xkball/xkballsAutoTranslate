@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
-@EventBusSubscriber(value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT,bus = EventBusSubscriber.Bus.MOD)
 public class XATKeyBind {
     
     public static final Lazy<KeyMapping> TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.translate", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T,"key.categories.misc"));
@@ -23,7 +23,7 @@ public class XATKeyBind {
         event.register(TRANSLATE_KEY.get());
     }
     
-    @EventBusSubscriber( value = Dist.CLIENT)
+    @EventBusSubscriber(value = Dist.CLIENT,bus = EventBusSubscriber.Bus.GAME)
     public static class GameEventHandler{
         @SubscribeEvent
         public static void beforeRender(ScreenEvent.Render.Pre event) {

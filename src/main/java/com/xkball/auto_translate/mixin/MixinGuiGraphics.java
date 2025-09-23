@@ -2,17 +2,27 @@ package com.xkball.auto_translate.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.xkball.auto_translate.api.IExtendedGuiGraphics;
+import com.xkball.auto_translate.client.gui.frame.screen.FrameScreen;
+import com.xkball.auto_translate.utils.ClientUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import org.joml.Vector2i;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.LinkedList;
 
 @Mixin(GuiGraphics.class)
 public class MixinGuiGraphics implements IExtendedGuiGraphics {
     
+    @Shadow @Final private PoseStack pose;
     @Unique
     private final LinkedList<Vector2i> xkball_sAutoTranslate$offsetStack = new LinkedList<>();
 
@@ -34,5 +44,14 @@ public class MixinGuiGraphics implements IExtendedGuiGraphics {
     @Override
     public void xat_popOffset() {
         xkball_sAutoTranslate$offsetStack.pop();
+    }
+    
+    @WrapOperation(method = "enableScissor",
+        at = @At(value = "NEW", target = "(IIII)Lnet/minecraft/client/gui/navigation/ScreenRectangle;"))
+    public ScreenRectangle wrapNewScreenRect(int x, int y, int w, int h, Operation<ScreenRectangle> original){
+        var result = original.call(x,y,w,h);
+        if(!(Minecraft.getInstance().screen instanceof FrameScreen)) return result;
+        result = ClientUtils.screenRectangleTransformAxisAligned(result,this.pose.last().pose());
+        return result;
     }
 }
