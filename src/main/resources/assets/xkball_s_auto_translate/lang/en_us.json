@@ -26,5 +26,7 @@
   "xat.gui.btn.cancel_inject_lang": "Cancel Inject Language Map",
   "xat.gui.btn.clear_cache": "Clear Cache",
   "xat.gui.processing": "Processing: ",
-  "xat.gui.error": "Error: "
+  "xat.gui.error": "Error: ",
+  "xat.gui.config.title.others": "Others",
+  "xat.gui.token_cost": "Total Token Cost: %d"
 }
