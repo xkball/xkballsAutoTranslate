@@ -39,8 +39,8 @@ public class ScrollableVHPanel extends ScrollableVerticalPanel{
                 k = this.getX();
             }
             
-            guiGraphics.blitSprite(RenderType::guiTextured,SCROLLER_BACKGROUND_SPRITE, x, l, w, 6);
-            guiGraphics.blitSprite(RenderType::guiTextured,SCROLLER_SPRITE, k, l, i1, 6);
+            guiGraphics.blitSprite(SCROLLER_BACKGROUND_SPRITE, x, l, w, 6);
+            guiGraphics.blitSprite(SCROLLER_SPRITE, k, l, i1, 6);
             
         }
     }

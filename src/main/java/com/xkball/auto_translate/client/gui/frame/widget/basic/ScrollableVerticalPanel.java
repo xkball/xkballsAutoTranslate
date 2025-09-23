@@ -149,8 +149,8 @@ public class ScrollableVerticalPanel extends VerticalPanel {
             }
             
             RenderSystem.enableBlend();
-            guiGraphics.blitSprite(RenderType::guiTextured,SCROLLER_BACKGROUND_SPRITE, l, y, 6, h);
-            guiGraphics.blitSprite(RenderType::guiTextured,SCROLLER_SPRITE, l, k, 6, i1);
+            guiGraphics.blitSprite(SCROLLER_BACKGROUND_SPRITE, l, y, 6, h);
+            guiGraphics.blitSprite(SCROLLER_SPRITE, l, k, 6, i1);
             RenderSystem.disableBlend();
            
         }

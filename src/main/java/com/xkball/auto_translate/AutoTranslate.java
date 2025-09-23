@@ -12,20 +12,17 @@ import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.llm.ILLMHandler;
 import com.xkball.auto_translate.llm.LLMResponse;
 import com.xkball.auto_translate.utils.LegacyUtils;
-import com.xkball.auto_translate.utils.VanillaUtils;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
-
-import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,8 +50,8 @@ public class AutoTranslate {
         }
         
         @SubscribeEvent
-        public static void onResourceReload(AddClientReloadListenersEvent event) {
-            event.addListener(VanillaUtils.modRL("update_language_map"),(ResourceManagerReloadListener) AutoTranslate::updateLanguageMap);
+        public static void onResourceReload(RegisterClientReloadListenersEvent event) {
+            event.registerReloadListener((ResourceManagerReloadListener) AutoTranslate::updateLanguageMap);
         }
     }
     

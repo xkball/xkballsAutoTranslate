@@ -182,21 +182,21 @@ public abstract class BaseContainerWidget extends AbstractContainerWidget implem
         }
     }
     
-    @Override
-    protected int contentHeight() {
-        return getHeight();
-    }
-    
-    @Override
-    protected double scrollRate() {
-        return 0;
-    }
-    
-    @Override
-    public boolean updateScrolling(double mouseX, double mouseY, int button) {
-        this.scrolling = false;
-        return false;
-    }
+//    @Override
+//    protected int contentHeight() {
+//        return getHeight();
+//    }
+//
+//    @Override
+//    protected double scrollRate() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public boolean updateScrolling(double mouseX, double mouseY, int button) {
+//        this.scrolling = false;
+//        return false;
+//    }
     
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
