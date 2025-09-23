@@ -1,4 +1,4 @@
-package com.xkball.auto_translate.utils;
+package com.xkball.auto_translate.utils.translate;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

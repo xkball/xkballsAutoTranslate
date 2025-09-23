@@ -1,7 +1,7 @@
 package com.xkball.auto_translate;
 
 import com.xkball.auto_translate.event.XATConfigUpdateEvent;
-import com.xkball.auto_translate.utils.TranslatorType;
+import com.xkball.auto_translate.utils.translate.TranslatorType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;

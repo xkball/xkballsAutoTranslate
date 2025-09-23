@@ -17,10 +17,13 @@ import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.util.LinkedList;
+import java.time.Duration;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
@@ -29,15 +32,15 @@ public class LLMClientImpl {
     
     private static volatile HttpClient CLIENT = HttpHandler.createClient();
     private static final Logger LOGGER = LogUtils.getLogger();
-    
-    private final Semaphore semaphore = new Semaphore(4);
+    private static final Executor EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
+    private final Semaphore semaphore = new Semaphore(8);
     private final String url;
     private final String apiKey;
     private final String model;
     private final int maxRetries;
     private Boolean valid = null;
     
-    private final Queue<Pair<LLMRequest,ILLMHandler>> requests = new LinkedList<>();
+    private final Queue<Pair<LLMRequest,ILLMHandler>> requests = new ConcurrentLinkedQueue<>();
     
     protected LLMClientImpl(String url, String apiKey, String model, int maxRetries) {
         this.url = url;
@@ -92,14 +95,17 @@ public class LLMClientImpl {
         }
         return builder.header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json.toString().replace('\n', ' ')))
+                .timeout(Duration.ofSeconds(20))
                 .build();
     }
     
     public void send(){
-        while(!this.requests.isEmpty()){
-            var request = this.requests.poll();
-            this.sendAsyncWithRetry(request.getFirst(),request.getSecond(), 0);
-        }
+        CompletableFuture.runAsync(() -> {
+            while(!this.requests.isEmpty()){
+                var request = this.requests.poll();
+                this.sendAsyncWithRetry(request.getFirst(),request.getSecond(), 0);
+            }
+        },EXECUTOR);
     }
     
     private void sendAsyncWithRetry(LLMRequest req,ILLMHandler handler,int retries){
@@ -111,19 +117,18 @@ public class LLMClientImpl {
             if(retries > 0){
                 LockSupport.parkNanos(2000000);
             }
-            CompletableFuture.runAsync(semaphore::acquireUninterruptibly)
-                    .thenAccept(ignore -> sendAsync(req,handler::handle)
-                        .thenAccept(res -> {
-                            if(!res)sendAsyncWithRetry(req,handler,retries+1);
-                        }))
-                    .handle((v,ex) -> {
+            CompletableFuture.runAsync(semaphore::acquireUninterruptibly,EXECUTOR)
+                    .thenCompose(ignore -> sendAsync(req,handler::handle))
+                    .handle((b,ex) -> {
                         if(ex != null){
                             LOGGER.error("LLM Request Error", ex);
+                            b = false;
                         }
                         semaphore.release();
-                        return null;
-                    })
-            ;
+                        return b;
+                    }).thenAccept(res -> {
+                        if(!res) sendAsyncWithRetry(req,handler,retries+1);
+                    });
         }
     }
     
@@ -151,6 +156,7 @@ public class LLMClientImpl {
             if (!XATConfig.HTTP_PROXY_HOST.isEmpty()) {
                 builder.proxy(ProxySelector.of(new InetSocketAddress(XATConfig.HTTP_PROXY_HOST, XATConfig.HTTP_PROXY_PORT)));
             }
+            builder.connectTimeout(Duration.ofSeconds(30));
             return builder.build();
         }
         

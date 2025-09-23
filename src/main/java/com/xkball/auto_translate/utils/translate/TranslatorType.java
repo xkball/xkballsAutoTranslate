@@ -1,4 +1,4 @@
-package com.xkball.auto_translate.utils;
+package com.xkball.auto_translate.utils.translate;
 
 import com.xkball.auto_translate.api.ITranslator;
 import net.minecraft.client.resources.language.I18n;

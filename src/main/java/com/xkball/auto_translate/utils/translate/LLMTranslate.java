@@ -1,4 +1,4 @@
-package com.xkball.auto_translate.utils;
+package com.xkball.auto_translate.utils.translate;
 
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
