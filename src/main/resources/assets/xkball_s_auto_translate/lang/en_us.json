@@ -28,5 +28,6 @@
   "xat.gui.processing": "Processing: ",
   "xat.gui.error": "Error: ",
   "xat.gui.config.title.others": "Others",
-  "xat.gui.token_cost": "Total Token Cost: %d"
+  "xat.gui.token_cost": "Total Token Cost: %d",
+  "xat.gui.open_config_screen": "Open Config Page of xkball's Auto Translate"
 }
