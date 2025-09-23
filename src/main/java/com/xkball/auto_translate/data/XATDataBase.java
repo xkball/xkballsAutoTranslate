@@ -63,7 +63,7 @@ public class XATDataBase {
         return new TranslationCacheSlice(conn, name);
     }
     
-    public void recordTokenCost(int count){
+    public synchronized void recordTokenCost(int count){
         String sql = "UPDATE extra_data SET value = value + ? WHERE id='token_count'";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, count);

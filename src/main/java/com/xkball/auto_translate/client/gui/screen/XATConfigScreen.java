@@ -14,10 +14,9 @@ import com.xkball.auto_translate.client.gui.frame.widget.basic.HorizontalPanel;
 import com.xkball.auto_translate.client.gui.frame.widget.basic.ScrollableVerticalPanel;
 import com.xkball.auto_translate.client.gui.widget.ObjectInputBox;
 import com.xkball.auto_translate.data.XATDataBase;
-import com.xkball.auto_translate.llm.LLMRequest;
 import com.xkball.auto_translate.utils.ClientUtils;
-import com.xkball.auto_translate.utils.LLMTranslate;
-import com.xkball.auto_translate.utils.TranslatorType;
+import com.xkball.auto_translate.utils.translate.LangKeyTranslateUnit;
+import com.xkball.auto_translate.utils.translate.TranslatorType;
 import com.xkball.auto_translate.utils.VanillaUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.CycleButton;
@@ -26,14 +25,10 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static com.xkball.auto_translate.AutoTranslate.LangKeyTranslateContext.*;
 
 public class XATConfigScreen extends FrameScreen {
     
@@ -43,6 +38,7 @@ public class XATConfigScreen extends FrameScreen {
             .paddingLeft(0.25f);
     private final ModContainer container;
     private final Screen modListScreen;
+    private final LangKeyTranslateUnit translateUnit = new LangKeyTranslateUnit();
     
     public XATConfigScreen(ModContainer container, Screen modListScreen) {
         super(Component.empty());
@@ -71,6 +67,9 @@ public class XATConfigScreen extends FrameScreen {
                         .addWidget(addNotice("xat.gui.config.run_trans_notice"))
                         .addWidget(createRunTransKeys())
                         .addWidget(createProcessingBar())
+                        .addWidget(createConfigTitle("xat.gui.config.title.others"))
+                        .addWidget(createTokenCostLabel())
+                        
                 );
         var screen = this.screenFrame("xat.gui.config", content);
         screen.resize();
@@ -95,6 +94,21 @@ public class XATConfigScreen extends FrameScreen {
                                 .apply(Label.ofKey(key))));
     }
     
+    public BaseContainerWidget createTokenCostLabel(){
+        return LINE_BASE.fork()
+                .fixHeight(10)
+                .apply(new HorizontalPanel(){
+                    @Override
+                    public boolean update(IUpdateMarker updateMarker) {
+                        this.clearWidget();
+                        this.addWidget(PanelConfig.of(1,1)
+                                .trim()
+                                .apply(Label.of(Component.translatable("xat.gui.token_cost",XATDataBase.INSTANCE.getTokenCost()))));
+                        return true;
+                    }
+                });
+    }
+    
     public BaseContainerWidget createProcessingBar(){
         return LINE_BASE.fork()
                 .align(HorizontalAlign.CENTER, VerticalAlign.CENTER)
@@ -106,11 +120,11 @@ public class XATConfigScreen extends FrameScreen {
                         this.addWidget(PanelConfig.of(0.4f,1)
                                 .paddingRight(4)
                                 .trim()
-                                .apply(Label.of(I18n.get("xat.gui.processing")+contextFinished+"/"+ contextSize).setColor(VanillaUtils.getColor(0,255,0,255))));
+                                .apply(Label.of(I18n.get("xat.gui.processing")+translateUnit.normalFinishedSize()+"/"+ translateUnit.size()).setColor(VanillaUtils.getColor(0,255,0,255))));
                         this.addWidget(PanelConfig.of(0.4f,1)
                                 .paddingLeft(4)
                                 .trim()
-                                .apply(Label.of(I18n.get("xat.gui.error")+contextError+"/"+ contextSize).setColor(VanillaUtils.getColor(255,0,0,255))));
+                                .apply(Label.of(I18n.get("xat.gui.error")+translateUnit.errorSize()+"/"+ translateUnit.size()).setColor(VanillaUtils.getColor(255,0,0,255))));
                         return true;
                     }
                 });
@@ -119,14 +133,12 @@ public class XATConfigScreen extends FrameScreen {
     public BaseContainerWidget createRunTransKeys(){
         var btn1 = FrameScreen.createButton("xat.gui.btn.run_trans_keys", this::runTransKeys);
         var btn2 = FrameScreen.createButton("xat.gui.btn.cancel_inject_lang", () -> {
-            contextSize = 0;
-            contextFinished = 0;
-            contextError = 0;
+            this.translateUnit.cancel();
             XATDataBase.INSTANCE.enableInjectLang(false);
             AutoTranslate.cancelInjectLanguage();
             XATConfigScreen.this.setNeedUpdate();
         });
-        var btn3 = FrameScreen.createButton("xat.gui.btn.clear_cache", I18N_KEYS::clear);
+        var btn3 = FrameScreen.createButton("xat.gui.btn.clear_cache", LangKeyTranslateUnit.I18N_KEYS::clear);
         var btnConfig = PanelConfig.of(0.25f,1)
                 .paddingLeft(4)
                 .paddingRight(4)
@@ -137,7 +149,7 @@ public class XATConfigScreen extends FrameScreen {
                 .apply(new HorizontalPanel(){
                     @Override
                     public boolean update(IUpdateMarker updateMarker) {
-                        btn1.inner.active = contextSize == 0;
+                        btn1.inner.active = translateUnit.finished;
                         btn2.inner.active = XATDataBase.INSTANCE.isEnableInjectLang();
                         this.clearWidget();
                         this.addWidget(btnConfig.apply(btn1));
@@ -149,36 +161,27 @@ public class XATConfigScreen extends FrameScreen {
     }
     
     public void runTransKeys(){
+        this.translateUnit.reset();
         XATConfigScreen.this.setNeedUpdate();
         XATDataBase.INSTANCE.enableInjectLang(true);
         var en = ClientUtils.getClientLanguage("en_us");
         var target = ClientUtils.getClientLanguage(XATConfig.TARGET_LANGUAGE_CONFIG.get()).getLanguageData().keySet();
         var diff = en.getLanguageData().entrySet().stream()
                 .filter(entry -> !entry.getValue().isEmpty()
-                        && I18N_KEYS.get(entry.getKey()) == null
+                        && LangKeyTranslateUnit.I18N_KEYS.get(entry.getKey()) == null
                         && !target.contains(entry.getKey())
                 ).toList();
         if(diff.isEmpty()){
             AutoTranslate.injectLanguage();
             return;
         }
-        var partitioned = IntStream.range(0, diff.size())
+        IntStream.range(0, diff.size())
                 .boxed()
                 .collect(Collectors.groupingBy(i -> i / 20))
                 .values().stream()
                 .map(indexes -> indexes.stream().map(diff::get).toList())
-                .map(AutoTranslate.LangKeyTranslateContext::new)
-                .toList();
-        var sp = StrSubstitutor.replace(AutoTranslate.DEFAULT_OPENAI_MULTIPLE_PROMPT, Map.of("targetLanguage","zh_cn"));
-        contextSize = partitioned.size();
-        contextFinished = 0;
-        contextError = 0;
-        var llmClient = LLMTranslate.createLLMClient();
-        for(var lktc : partitioned) {
-            var request = new LLMRequest(sp,lktc.createLLMRequestUserPrompt());
-            llmClient.addRequest(request,lktc);
-        }
-        llmClient.send();
+                .forEach(translateUnit::submitRequest);
+        this.translateUnit.start();
     }
     
     public <T> AutoResizeWidgetWrapper saveButton(Supplier<T> supplier, ModConfigSpec.ConfigValue<T> config){

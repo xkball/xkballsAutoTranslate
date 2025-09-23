@@ -26,5 +26,7 @@
   "xat.gui.btn.cancel_inject_lang": "取消注入语言映射",
   "xat.gui.btn.clear_cache": "清除缓存",
   "xat.gui.processing": "处理中：",
-  "xat.gui.error": "错误："
+  "xat.gui.error": "错误：",
+  "xat.gui.config.title.others": "其他",
+  "xat.gui.token_cost": "总 Token 消耗: %d"
 }
