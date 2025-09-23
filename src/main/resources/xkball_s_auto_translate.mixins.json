@@ -11,7 +11,8 @@
     "MixinFTBQQuestScreen",
     "MixinAbstractWidgetAccess",
     "MixinBookViewScreen",
-    "MixinGuiGraphics"
+    "MixinGuiGraphics",
+    "MixinLanguageSelectScreen"
   ],
   "injectors": {
     "defaultRequire": 1

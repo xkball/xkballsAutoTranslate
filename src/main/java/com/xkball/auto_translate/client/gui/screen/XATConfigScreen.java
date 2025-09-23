@@ -25,6 +25,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -36,14 +37,12 @@ public class XATConfigScreen extends FrameScreen {
             .align(HorizontalAlign.LEFT, VerticalAlign.CENTER)
             .paddingTop(8)
             .paddingLeft(0.25f);
-    private final ModContainer container;
-    private final Screen modListScreen;
+    private final Screen parentScreen;
     private final LangKeyTranslateUnit translateUnit = new LangKeyTranslateUnit();
     
-    public XATConfigScreen(ModContainer container, Screen modListScreen) {
+    public XATConfigScreen(@Nullable ModContainer container, Screen parent) {
         super(Component.empty());
-        this.container = container;
-        this.modListScreen = modListScreen;
+        this.parentScreen = parent;
     }
     
     @Override
@@ -255,7 +254,9 @@ public class XATConfigScreen extends FrameScreen {
     
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.modListScreen);
+        if (this.minecraft != null) {
+            this.minecraft.setScreen(this.parentScreen);
+        }
     }
     
     @Override
