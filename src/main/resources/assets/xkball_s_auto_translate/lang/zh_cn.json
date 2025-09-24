@@ -28,5 +28,10 @@
   "xat.gui.processing": "处理中：",
   "xat.gui.error": "错误：",
   "xat.gui.config.title.others": "其他",
-  "xat.gui.token_cost": "总 Token 消耗: %d"
+  "xat.gui.token_cost": "总 Token 消耗: %d",
+  "xat.gui.open_config_screen": "打开\"xkball的自动翻译\"配置页面",
+  "xat.warn": "[xkball的自动翻译]: ",
+  "xat.warn.no_translator": "未设置有效的翻译器.",
+  "xat.warn.no_inject": "未启用翻译本地化键.",
+  "xat.warn.open_config_screen": "点击打开配置界面."
 }
