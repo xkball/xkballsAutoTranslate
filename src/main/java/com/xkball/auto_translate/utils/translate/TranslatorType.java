@@ -1,5 +1,6 @@
 package com.xkball.auto_translate.utils.translate;
 
+import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
 import net.minecraft.client.resources.language.I18n;
 
@@ -18,5 +19,9 @@ public enum TranslatorType {
     
     public ITranslator getTranslator() {
         return translator;
+    }
+    
+    public static ITranslator getCurrentTranslator() {
+        return XATConfig.TRANSLATOR_TYPE.getTranslator();
     }
 }
