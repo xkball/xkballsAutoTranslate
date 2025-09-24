@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class LangKeyTranslateUnit {
     public static final TranslationCacheSlice I18N_KEYS = XATDataBase.INSTANCE.createSlice("i18n_keys");
@@ -59,8 +60,28 @@ public class LangKeyTranslateUnit {
         LOGGER.debug("Translating: {}/{}", contextFinished.size(), contextSize);
         IPanel.GLOBAL_UPDATE_MARKER.setNeedUpdate();
         if (contextFinished.size() == contextSize) {
-            finished = true;
-            AutoTranslate.injectLanguage();
+            if(this.errorSize() > 0){
+                this.resolveFailedRequest();
+            }
+            else {
+                finished = true;
+                AutoTranslate.injectLanguage();
+            }
+        }
+    }
+    
+    public synchronized void resolveFailedRequest() {
+        for(var failedReq : this.contextError){
+            var reqs = failedReq.getRawMap().entrySet().stream()
+                    .map(entry -> TranslatorType.getCurrentTranslator().translate(entry.getValue())
+                            .thenAccept(res -> I18N_KEYS.put(entry.getKey(),res))).toArray(CompletableFuture[]::new);
+            CompletableFuture.allOf(reqs)
+                    .thenAccept((v) -> {
+                        synchronized (this) {
+                            this.contextError.remove(failedReq);
+                            this.checkFinish();
+                        }
+                    });
         }
     }
     
