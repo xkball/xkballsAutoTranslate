@@ -32,7 +32,7 @@ public class XATConfig {
     public static final ModConfigSpec.IntValue HTTP_PROXY_PORT_CONFIG = BUILDER.comment("The http port if http proxy host not empty.").defineInRange("http_proxy_port",0,Integer.MIN_VALUE,Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue MAX_RETRIES_CONFIG = BUILDER.comment("Maximum retries number in case of network error.").defineInRange("max_retries",6,0,Integer.MAX_VALUE);
     public static final ModConfigSpec.ConfigValue<TranslatorType> TRANSLATOR_TYPE_CONFIG = BUILDER.comment("The translator.(The default translator will only notice you to choose a translator.)").defineEnum("translator_type",TranslatorType.DEFAULT,TranslatorType.values());
-    public static final ModConfigSpec.ConfigValue<String> TARGET_LANGUAGE_CONFIG = BUILDER.comment("The language you want to translate to.Should use Locale Code like \"en_us\".Default: zh_cn").define("target_language", "zh_cn");
+    public static final ModConfigSpec.ConfigValue<String> TARGET_LANGUAGE_CONFIG = BUILDER.comment("The language you want to translate to.Should use Locale Code like \"en_us\".Default: zn_ch").define("target_language", "zn_ch");
     public static final ModConfigSpec.ConfigValue<String> LLM_API_URL_CONFIG = BUILDER.comment("This mod use OpenAI API.The API endpoint URL for LLM service.Default: \"\"").define("llm_api_url", "");
     public static final ModConfigSpec.ConfigValue<String> LLM_API_KEY_CONFIG = BUILDER.comment("The API key of LLM API.Default: \"\"").define("llm_api_key", "");
     public static final ModConfigSpec.ConfigValue<String> LLM_MODEL_CONFIG = BUILDER.comment("The model to use for translations.Default: \"\"").define("llm_model", "");

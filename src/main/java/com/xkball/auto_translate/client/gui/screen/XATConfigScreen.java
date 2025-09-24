@@ -37,10 +37,11 @@ public class XATConfigScreen extends FrameScreen {
             .align(HorizontalAlign.LEFT, VerticalAlign.CENTER)
             .paddingTop(8)
             .paddingLeft(0.25f);
+    @Nullable
     private final Screen parentScreen;
     private final LangKeyTranslateUnit translateUnit = new LangKeyTranslateUnit();
     
-    public XATConfigScreen(@Nullable ModContainer container, Screen parent) {
+    public XATConfigScreen(@Nullable ModContainer container,@Nullable Screen parent) {
         super(Component.empty());
         this.parentScreen = parent;
     }

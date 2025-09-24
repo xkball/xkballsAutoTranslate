@@ -29,5 +29,9 @@
   "xat.gui.error": "Error: ",
   "xat.gui.config.title.others": "Others",
   "xat.gui.token_cost": "Total Token Cost: %d",
-  "xat.gui.open_config_screen": "Open Config Page of xkball's Auto Translate"
+  "xat.gui.open_config_screen": "Open Config Page of xkball's Auto Translate",
+  "xat.warn": "[xkball's Auto Translate]: ",
+  "xat.warn.no_translator": "No valid translator.",
+  "xat.warn.no_inject": "Translate i18n keys disabled.",
+  "xat.warn.open_config_screen": "Click to open config screen."
 }
