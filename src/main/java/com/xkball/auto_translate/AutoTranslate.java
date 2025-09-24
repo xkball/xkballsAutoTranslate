@@ -59,6 +59,41 @@ public class AutoTranslate {
         }
     }
     
+    @SubscribeEvent
+    public static void onPlayerEnterWorld(ClientPlayerNetworkEvent.LoggingIn event) {
+        var player = event.getPlayer();
+        var flag = false;
+        if(XATConfig.TRANSLATOR_TYPE == TranslatorType.DEFAULT){
+            flag = true;
+            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
+                    .append(Component.translatable("xat.warn.no_translator").withStyle(ChatFormatting.RED)),false);
+        }
+        if(!XATDataBase.INSTANCE.isEnableInjectLang()){
+            flag = true;
+            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
+                    .append(Component.translatable("xat.warn.no_inject").withStyle(ChatFormatting.RED)),false);
+        }
+        if (flag) {
+            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
+                    .append(Component.translatable("xat.warn.open_config_screen")
+                    .withStyle(Style.EMPTY
+                                    .withColor(ChatFormatting.GREEN)
+                                    .withUnderlined(true)
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/xat open_config_screen")))),false);
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onRegClientCommand(RegisterClientCommandsEvent event){
+        event.getDispatcher().register(
+                Commands.literal("xat")
+                        .then(Commands.literal("open_config_screen")
+                        .executes(s -> {
+                            Minecraft.getInstance().setScreen(new XATConfigScreen(null, null));
+                            return 0;
+                        })));
+    }
+    
     public static void injectLanguage(){
         LOGGER.info("Injecting language.");
         var map = new HashMap<String, String>();
