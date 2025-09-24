@@ -42,7 +42,7 @@ public class LangKeyTranslateContext implements ILLMHandler {
     
     @Override
     public boolean handle(LLMResponse response) {
-        LOGGER.debug(response.getContent());
+//        LOGGER.debug(response.getContent());
         List<String> translateResult = new ArrayList<>();
         try {
             List<Map<String, Object>> translatedItems = LegacyUtils.parseYaml(response.getContent());
@@ -50,6 +50,7 @@ public class LangKeyTranslateContext implements ILLMHandler {
                 translateResult.add((Integer) map.get("id"), (String) map.get("text"));
             }
         } catch (Exception e) {
+            LOGGER.warn("Cannot parse response to yaml: {}", response.getContent());
             return false;
         }
         if (translateResult.size() != this.keys.size()) {
@@ -65,5 +66,15 @@ public class LangKeyTranslateContext implements ILLMHandler {
     @Override
     public void onRetriesExceeded() {
         this.unit.submitResultError(this);
+    }
+    
+    @Override
+    public String toString() {
+        return "LangKeyTranslateContext{" +
+                "unit=" + unit +
+                ", keys=" + keys +
+                ", values=" + values +
+                ", result=" + result +
+                '}';
     }
 }
