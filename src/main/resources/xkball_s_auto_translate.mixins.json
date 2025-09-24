@@ -10,7 +10,6 @@
     "MixinFTBQQuestObjectBase",
     "MixinFTBQQuestScreen",
     "MixinAbstractWidgetAccess",
-    "MixinBookViewScreen",
     "MixinGuiGraphics",
     "MixinLanguageSelectScreen"
   ],

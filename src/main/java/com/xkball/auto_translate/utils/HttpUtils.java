@@ -20,7 +20,6 @@ public class HttpUtils {
         
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenCompose(response -> {
-                    System.out.println(222);
                     if (response.statusCode() == 200) {
                         return CompletableFuture.completedFuture(response);
                     } else if (remainingRetries > 0) {

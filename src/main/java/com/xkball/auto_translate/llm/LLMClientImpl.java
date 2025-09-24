@@ -89,7 +89,7 @@ public class LLMClientImpl {
         messages.add(system);
         messages.add(user);
         json.add("messages", messages);
-        var builder = HttpRequest.newBuilder(URI.create(this.url));
+        var builder = HttpRequest.newBuilder(URI.create(this.url.trim()));
         if (!this.apiKey.isEmpty()) {
             builder.header("Authorization", "Bearer " + this.apiKey);
         }
@@ -148,7 +148,7 @@ public class LLMClientImpl {
         }
     }
     
-    @EventBusSubscriber
+    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
     public static class HttpHandler {
         
         public static HttpClient createClient() {
