@@ -134,13 +134,13 @@ public class LLMClientImpl {
     
     public <T> CompletableFuture<T> sendAsync(LLMRequest req,Function<LLMResponse, T> overrideHandler){
         return HttpUtils.sendWithRetry(CLIENT,createHttpRequest(req), XATConfig.MAX_RETRIES)
-                .thenApply((response) -> overrideHandler.apply(LLMResponse.fromString(response.body())));
+                .thenApplyAsync((response) -> overrideHandler.apply(LLMResponse.fromString(response.body())),EXECUTOR);
     }
     
     public <T> Either<T,Throwable> sendSync(LLMRequest req, Function<LLMResponse, T> overrideHandler){
         try {
             var t = HttpUtils.sendWithRetry(CLIENT,createHttpRequest(req), XATConfig.MAX_RETRIES)
-                    .thenApply((response) -> overrideHandler.apply(LLMResponse.fromString(response.body())))
+                    .thenApplyAsync((response) -> overrideHandler.apply(LLMResponse.fromString(response.body())),EXECUTOR)
                     .get();
             return Either.left(t);
         } catch (ExecutionException | InterruptedException e) {

@@ -18,6 +18,7 @@ public class LangKeyTranslateContext implements ILLMHandler {
     public final LangKeyTranslateUnit unit;
     public final List<String> keys = new ArrayList<>();
     public final List<String> values = new ArrayList<>();
+    public final Map<String, String> raw = new HashMap<>();
     public final Map<String, String> result = new HashMap<>();
     
     public LangKeyTranslateContext(List<Map.Entry<String, String>> elt, LangKeyTranslateUnit unit) {
@@ -29,6 +30,7 @@ public class LangKeyTranslateContext implements ILLMHandler {
             }
             keys.add(entry.getKey());
             values.add(entry.getValue());
+            raw.put(entry.getKey(), entry.getValue());
         }
     }
     
@@ -38,6 +40,10 @@ public class LangKeyTranslateContext implements ILLMHandler {
             items.add(Map.of("id", i, "text", values.get(i)));
         }
         return LegacyUtils.toYaml(items);
+    }
+    
+    public Map<String, String> getRawMap(){
+        return raw;
     }
     
     @Override
