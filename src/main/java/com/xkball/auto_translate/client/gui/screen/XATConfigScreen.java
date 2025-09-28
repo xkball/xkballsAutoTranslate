@@ -109,6 +109,17 @@ public class XATConfigScreen extends FrameScreen {
                 });
     }
     
+    public BaseContainerWidget createClearAllButton(){
+        return LINE_BASE.fork()
+                .fixHeight(40)
+                .apply(new HorizontalPanel()
+                        .addWidget(PanelConfig.of(0.6f,1)
+                        .fixHeight(20)
+                        .paddingLeft(8)
+                        .paddingRight(8)
+                        .apply(FrameScreen.createButton("xat.gui.btn.clear_all_cache", XATDataBase.INSTANCE::clearAllTranslateCache))));
+    }
+    
     public BaseContainerWidget createProcessingBar(){
         return LINE_BASE.fork()
                 .align(HorizontalAlign.CENTER, VerticalAlign.CENTER)
