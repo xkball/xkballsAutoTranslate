@@ -10,12 +10,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XATDataBase {
     
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final XATDataBase INSTANCE = createInstance();
     
+    protected final List<TranslationCacheSlice> trSlices = new ArrayList<>();
     protected final Connection conn;
     
     private static XATDataBase createInstance(){
@@ -60,7 +63,9 @@ public class XATDataBase {
         }catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return new TranslationCacheSlice(conn, name);
+        var result = new TranslationCacheSlice(conn, name);
+        this.trSlices.add(result);
+        return result;
     }
     
     public synchronized void recordTokenCost(int count){
@@ -109,6 +114,12 @@ public class XATDataBase {
         return false;
     }
     
+    public void clearAllTranslateCache(){
+        for(var slice : trSlices){
+            slice.clear();
+        }
+    }
+    
     public static class InMemory extends XATDataBase {
         
         private int cost = 0;
@@ -119,7 +130,9 @@ public class XATDataBase {
         
         @Override
         public TranslationCacheSlice createSlice(String name) {
-            return new TranslationCacheSlice.InMemory(name);
+            var result = new TranslationCacheSlice.InMemory(name);
+            this.trSlices.add(result);
+            return result;
         }
         
         @Override
