@@ -4,9 +4,12 @@ import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
 import com.xkball.auto_translate.api.IXATQuestExtension;
 import com.xkball.auto_translate.api.IXATQuestScreenExtension;
+import com.xkball.auto_translate.data.TranslationCacheSlice;
+import com.xkball.auto_translate.data.XATDataBase;
 import dev.ftb.mods.ftblibrary.ui.IScreenWrapper;
 import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
 import mezz.jei.api.constants.VanillaTypes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CrossModBridge {
+    
+    public static final TranslationCacheSlice FTBQ_CACHE = XATDataBase.INSTANCE.createSlice("ftbq");
     
     @Nullable
     public static ItemStack getHoverItemOnJEIOverlay(){
@@ -50,24 +55,23 @@ public class CrossModBridge {
     
     public static class FTBQHandler{
         
-        public static final Map<String,String> translationMappings = new ConcurrentHashMap<>();
-        
         public static void tryTranslateQuest(boolean force){
-            if(!(event.getScreen() instanceof IScreenWrapper isw)) return;
+            var screen = Minecraft.getInstance().screen;
+            if(!(screen instanceof IScreenWrapper isw)) return;
             if(!(isw.getGui() instanceof QuestScreen questScreen)) return;
             var quest = questScreen.getViewedQuest();
             if(quest == null) return;
             var qExtension = IXATQuestExtension.asExtension(quest);
             var qsExtension = IXATQuestScreenExtension.asExtension(questScreen);
-            translate(qExtension.xkball_sAutoTranslate$getTitleUnmodified().getString()).thenRunAsync(() -> {
+            translate(qExtension.xkball_sAutoTranslate$getTitleUnmodified().getString(),force).thenRunAsync(() -> {
                     qExtension.xkball_sAutoTranslate$invalidTitleCache();
                     qsExtension.xkball_sAutoTranslate$markNeedRefresh();
             });
-            translate(qExtension.xkball_sAutoTranslate$getSubtitleUnmodified().getString()).thenRunAsync(() -> {
+            translate(qExtension.xkball_sAutoTranslate$getSubtitleUnmodified().getString(),force).thenRunAsync(() -> {
                 qExtension.xkball_sAutoTranslate$invalidSubtitleCache();
                 qsExtension.xkball_sAutoTranslate$markNeedRefresh();
             });
-            CompletableFuture.allOf(qExtension.xkball_sAutoTranslate$getDescriptionUnmodified().stream().map(Component::getString).map(FTBQHandler::translate).toArray(CompletableFuture[]::new))
+            CompletableFuture.allOf(qExtension.xkball_sAutoTranslate$getDescriptionUnmodified().stream().map(Component::getString).map(str -> translate(str,force)).toArray(CompletableFuture[]::new))
                     .thenRunAsync(() -> {
                         qExtension.xkball_sAutoTranslate$invalidDescriptionCache();
                         qsExtension.xkball_sAutoTranslate$markNeedRefresh();
@@ -76,10 +80,10 @@ public class CrossModBridge {
             qsExtension.xkball_sAutoTranslate$markNeedRefresh();
         }
         
-        private static CompletableFuture<Void> translate(String str){
+        private static CompletableFuture<Void> translate(String str,boolean force){
             if(str.isEmpty()) return CompletableFuture.completedFuture(null);
-            translationMappings.put(str, I18n.get(ITranslator.TRANSLATING_KEY));
-            return XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).thenAcceptAsync(result -> translationMappings.put(str,result));
+            if(!force && FTBQ_CACHE.getOrDefault(str) != null) return CompletableFuture.completedFuture(null);
+            return XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).thenAcceptAsync(result -> FTBQ_CACHE.put(str,result));
         }
     }
 }

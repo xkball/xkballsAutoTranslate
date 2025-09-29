@@ -30,7 +30,7 @@ public class MixinFTBQQuestObjectBase {
     public void afterGetTitle(CallbackInfoReturnable<Component> cir){
         if((Object)this instanceof Quest quest && IXATQuestExtension.asExtension(quest).xkball_sAutoTranslate$isInvalidTitleCache()){
             IXATQuestExtension.asExtension(quest).xkball_sAutoTranslate$setValidTitleCache(false);
-            var translation = CrossModBridge.FTBQHandler.translationMappings.get(cachedTitle.getString());
+            var translation = CrossModBridge.FTBQ_CACHE.get(cachedTitle.getString());
             if(translation != null){
                 this.cachedTitle = Component.empty().append(cachedTitle).append(Component.literal(translation).withStyle(ChatFormatting.DARK_GRAY));
             }

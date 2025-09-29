@@ -1,5 +1,8 @@
 package com.xkball.auto_translate.data;
 
+import com.xkball.auto_translate.api.ITranslator;
+import net.minecraft.client.resources.language.I18n;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +30,11 @@ public class TranslationCacheSlice {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public String getOrDefault(String key){
+        var result = get(key);
+        return result != null ? result : I18n.get(ITranslator.TRANSLATING_KEY);
     }
     
     public void put(String key, String value){
