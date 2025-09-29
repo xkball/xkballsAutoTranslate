@@ -1,7 +1,6 @@
 package com.xkball.auto_translate.crossmod;
 
 import com.xkball.auto_translate.XATConfig;
-import com.xkball.auto_translate.api.ITranslator;
 import com.xkball.auto_translate.api.IXATQuestExtension;
 import com.xkball.auto_translate.api.IXATQuestScreenExtension;
 import com.xkball.auto_translate.data.TranslationCacheSlice;
@@ -10,15 +9,12 @@ import dev.ftb.mods.ftblibrary.ui.IScreenWrapper;
 import dev.ftb.mods.ftbquests.client.gui.quests.QuestScreen;
 import mezz.jei.api.constants.VanillaTypes;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CrossModBridge {
     
