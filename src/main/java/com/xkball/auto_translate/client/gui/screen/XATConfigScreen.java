@@ -69,6 +69,7 @@ public class XATConfigScreen extends FrameScreen {
                         .addWidget(createProcessingBar())
                         .addWidget(createConfigTitle("xat.gui.config.title.others"))
                         .addWidget(createTokenCostLabel())
+                        .addWidget(createClearAllButton())
                         
                 );
         var screen = this.screenFrame("xat.gui.config", content);
@@ -113,7 +114,7 @@ public class XATConfigScreen extends FrameScreen {
         return LINE_BASE.fork()
                 .fixHeight(40)
                 .apply(new HorizontalPanel()
-                        .addWidget(PanelConfig.of(0.6f,1)
+                        .addWidget(PanelConfig.of(1f,1)
                         .fixHeight(20)
                         .paddingLeft(8)
                         .paddingRight(8)

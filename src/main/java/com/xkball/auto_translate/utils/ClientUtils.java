@@ -6,9 +6,14 @@ import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.FormattedCharSink;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+@ParametersAreNonnullByDefault
 public class ClientUtils {
     
     public static ClientLanguage getClientLanguage(String lang){
@@ -23,6 +28,27 @@ public class ClientUtils {
             Vector3f vector3f = pose.transformPosition((float)rect.left(), (float)rect.top(), 0.0F, new Vector3f());
             Vector3f vector3f1 = pose.transformPosition((float)rect.right(), (float)rect.bottom(), 0.0F, new Vector3f());
             return new ScreenRectangle(Mth.floor(vector3f.x), Mth.floor(vector3f.y), Mth.floor(vector3f1.x - vector3f.x), Mth.floor(vector3f1.y - vector3f.y));
+        }
+    }
+    
+    public static String getAsString(FormattedCharSequence charSequence){
+        var s = new FormattedCharToString();
+        charSequence.accept(s);
+        return s.toString();
+    }
+    
+    private static class FormattedCharToString implements FormattedCharSink{
+        
+        public final StringBuilder sb = new StringBuilder();
+        @Override
+        public boolean accept(int positionInCurrentSequence, Style style, int codePoint) {
+            sb.appendCodePoint(codePoint);
+            return true;
+        }
+        
+        @Override
+        public String toString() {
+            return sb.toString();
         }
     }
 }
