@@ -34,5 +34,7 @@
   "xat.warn.no_translator": "No valid translator.",
   "xat.warn.no_inject": "Translate i18n keys disabled.",
   "xat.warn.open_config_screen": "Click to open config screen.",
-  "xat.gui.btn.clear_all_cache": "Clear All Translation cache."
+  "xat.gui.btn.clear_all_cache": "Clear All Translation cache.",
+  "keys.xkball_s_auto_translate.retranslate": "ReTranslate",
+  "xat.gui.toggle_translate": "Toggle Translate"
 }

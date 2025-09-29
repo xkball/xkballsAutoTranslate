@@ -108,7 +108,7 @@ public class LLMClientImpl {
         },EXECUTOR);
     }
     
-    private void sendAsyncWithRetry(LLMRequest req,ILLMHandler handler,int retries){
+    public void sendAsyncWithRetry(LLMRequest req, ILLMHandler handler,int retries){
         if(retries > this.maxRetries){
             LOGGER.warn("LLM Request Exceeded Max Retries: {}", retries);
             handler.onRetriesExceeded();

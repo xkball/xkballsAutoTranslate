@@ -6,7 +6,6 @@ import mezz.jei.api.constants.VanillaTypes;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.event.ScreenEvent;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -23,9 +22,9 @@ public class CrossModBridge {
         return null;
     }
     
-    public static void tryTranslateFTBQuest(ScreenEvent.Render.Pre event){
+    public static void tryTranslateFTBQuest(boolean force){
         if(ModList.get().isLoaded("ftbquests")){
-            FTBQHandler.tryTranslateQuest(event);
+            FTBQHandler.tryTranslateQuest(force);
         }
     }
     
@@ -47,7 +46,7 @@ public class CrossModBridge {
         
         public static final Map<String,String> translationMappings = new ConcurrentHashMap<>();
         
-        public static void tryTranslateQuest(ScreenEvent.Render.Pre event){
+        public static void tryTranslateQuest(boolean force){
 //            if(!(event.getScreen() instanceof IScreenWrapper isw)) return;
 //            if(!(isw.getGui() instanceof QuestScreen questScreen)) return;
 //            var quest = questScreen.getViewedQuest();
