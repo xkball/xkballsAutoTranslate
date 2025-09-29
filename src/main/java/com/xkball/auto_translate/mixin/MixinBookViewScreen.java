@@ -11,7 +11,6 @@ import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -81,7 +80,7 @@ public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
     @Inject(method = "renderBackground",at = @At("RETURN"))
     public void onRenderBg(GuiGraphics guiGraphics, int p_296491_, int p_294260_, float p_294869_, CallbackInfo ci){
         if(xat_tr.get()){
-            guiGraphics.blit(RenderType::guiTextured, BOOK_LOCATION, (this.width - 192) / 2 + 146, 2, 0.0F, 0.0F, 192, 192, 256, 256);
+            guiGraphics.blit(BOOK_LOCATION, (this.width - 192) / 2 + 146, 2, 0.0F, 0.0F, 192, 192, 256, 256);
         }
     }
     

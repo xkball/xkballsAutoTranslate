@@ -63,7 +63,7 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
     public void afterGetSubtitle(CallbackInfoReturnable<Component> cir){
         if(this.xkball_sAutoTranslate$isInvalidSubtitleCache()){
             this.xkball_sAutoTranslate$setValidSubtitleCache(false);
-            var translation = CrossModBridge.FTBQHandler.translationMappings.get(cachedSubtitle.getString());
+            var translation = CrossModBridge.FTBQ_CACHE.getOrDefault(cachedSubtitle.getString());
             if(translation != null){
                 this.cachedSubtitle = Component.empty().append(cachedSubtitle).append(Component.literal(translation).withStyle(ChatFormatting.DARK_GRAY));
             }
@@ -88,7 +88,7 @@ public abstract class MixinFTBQQuest extends QuestObject implements IXATQuestExt
             var list = new ArrayList<>(cachedDescription);
             list.add(Component.empty());
             for(var component : cachedDescription){
-                var translation = CrossModBridge.FTBQHandler.translationMappings.get(component.getString());
+                var translation = CrossModBridge.FTBQ_CACHE.getOrDefault(component.getString());
                 if(translation != null) list.add(Component.literal(translation).withStyle(component.getStyle()));
             }
             cachedDescription = Collections.unmodifiableList(list);

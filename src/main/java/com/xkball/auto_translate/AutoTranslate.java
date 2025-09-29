@@ -42,7 +42,7 @@ import java.util.Objects;
 
 
 @Mod(value = AutoTranslate.MODID,dist = Dist.CLIENT)
-@EventBusSubscriber()
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
 public class AutoTranslate {
 
     public static final String MODID = "xkball_s_auto_translate";
