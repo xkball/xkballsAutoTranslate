@@ -1,6 +1,6 @@
 # xkball's Auto Translation
 
-![Discord](https://img.shields.io/discord/1370807259495534663?style=flat-square&logo=discord&label=xkball's%20mods&link=https%3A%2F%2Fdiscord.gg%2FS9DBXWHNsc)![GitHub License](https://img.shields.io/github/license/xkball/xkballsAutoTranslate?style=flat-square)
+![Discord](https://img.shields.io/discord/1370807259495534663?style=flat-square&logo=discord&label=xkball's%20mods&link=https%3A%2F%2Fdiscord.gg%2FS9DBXWHNsc) ![GitHub License](https://img.shields.io/github/license/xkball/xkballsAutoTranslate?style=flat-square)
 
 This mod add a key binding (default is T) that triggers machine  translation when the mouse is over an item or when the FTB quest details screen is open.
 
