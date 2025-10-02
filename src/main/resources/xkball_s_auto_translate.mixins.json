@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.xkball.auto_translate.mixin",
+  "refmap": "xkball_s_auto_translate.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
   ],

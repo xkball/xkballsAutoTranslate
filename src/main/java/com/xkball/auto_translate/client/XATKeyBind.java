@@ -3,10 +3,12 @@ package com.xkball.auto_translate.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.xkball.auto_translate.event.XATGatherTranslateInputEvent;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -30,10 +32,10 @@ public class XATKeyBind {
         @SubscribeEvent
         public static void onKeyInput(ScreenEvent.KeyPressed.Pre event){
             if(TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))){
-                NeoForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(false));
+                MinecraftForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(false));
             }
             if(RE_TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))){
-                NeoForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(true));
+                MinecraftForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(true));
             }
         }
     }

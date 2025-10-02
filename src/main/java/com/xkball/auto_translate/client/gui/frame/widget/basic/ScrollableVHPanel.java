@@ -3,7 +3,6 @@ package com.xkball.auto_translate.client.gui.frame.widget.basic;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import org.joml.Vector2f;
 
@@ -39,8 +38,8 @@ public class ScrollableVHPanel extends ScrollableVerticalPanel{
                 k = this.getX();
             }
             
-            guiGraphics.blitSprite(SCROLLER_BACKGROUND_SPRITE, x, l, w, 6);
-            guiGraphics.blitSprite(SCROLLER_SPRITE, k, l, i1, 6);
+            guiGraphics.blit(SCROLLER_BACKGROUND_SPRITE, x, l, 0, 0, w, 6);
+            guiGraphics.blit(SCROLLER_SPRITE, k, l, 0, 0, i1, 6);
             
         }
     }
@@ -98,7 +97,7 @@ public class ScrollableVHPanel extends ScrollableVerticalPanel{
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         if(InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(),InputConstants.KEY_LSHIFT)){
             this.setClampedScrollAmountH(this.scrollAmountH - scrollY * 10);
         }

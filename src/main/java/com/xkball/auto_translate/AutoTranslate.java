@@ -1,6 +1,17 @@
 package com.xkball.auto_translate;
 
+import com.xkball.auto_translate.client.gui.frame.core.IPanel;
+import com.xkball.auto_translate.utils.translate.TranslatorType;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -8,36 +19,37 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import com.xkball.auto_translate.client.gui.screen.XATConfigScreen;
 import com.xkball.auto_translate.data.XATDataBase;
-import com.xkball.auto_translate.utils.VanillaUtils;
 import com.xkball.auto_translate.utils.translate.LangKeyTranslateUnit;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 
 @Mod(AutoTranslate.MODID)
+@Mod.EventBusSubscriber
 public class AutoTranslate {
 
     public static final String MODID = "xkball_s_auto_translate";
     private static final Logger LOGGER = LogUtils.getLogger();
-    public static final boolean IS_DEBUG = SharedConstants.IS_RUNNING_WITH_JDWP;
+    public static final boolean IS_DEBUG = ManagementFactory.getRuntimeMXBean().getInputArguments().stream().anyMatch(str -> str.startsWith("-agentlib:jdwp"));
 
     public AutoTranslate(FMLJavaModLoadingContext context) {
+//        var clazz = JDBC.class;
         context.registerConfig(ModConfig.Type.COMMON, XATConfig.SPEC);
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, XATConfigScreen::new);
+        var container = context.getContainer();
+        container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory(XATConfigScreen::new));
     }
     
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -89,7 +101,7 @@ public class AutoTranslate {
                 Commands.literal("xat")
                         .then(Commands.literal("open_config_screen")
                         .executes(s -> {
-                            Minecraft.getInstance().setScreen(new XATConfigScreen(null, null));
+                            Minecraft.getInstance().setScreen(new XATConfigScreen(null));
                             return 0;
                         })));
     }
@@ -100,10 +112,9 @@ public class AutoTranslate {
         map.putAll(Language.getInstance().getLanguageData());
         map.putAll(LangKeyTranslateUnit.I18N_KEYS.toMap());
         var defaultRightToLeft = Language.getInstance().isDefaultRightToLeft();
-        var clientLang = new ClientLanguage(map,defaultRightToLeft,Map.of());
+        var clientLang = new ClientLanguage(map,defaultRightToLeft);
         I18n.setLanguage(clientLang);
         Language.inject(clientLang);
-        Minecraft.getInstance().getLanguageManager().reloadCallback.accept(clientLang);
         IPanel.GLOBAL_UPDATE_MARKER.setNeedUpdate();
     }
     
@@ -124,7 +135,6 @@ public class AutoTranslate {
         ClientLanguage clientlanguage = ClientLanguage.loadFrom(Minecraft.getInstance().getResourceManager(), list, flag);
         I18n.setLanguage(clientlanguage);
         Language.inject(clientlanguage);
-        Minecraft.getInstance().getLanguageManager().reloadCallback.accept(clientlanguage);
     }
     
 }

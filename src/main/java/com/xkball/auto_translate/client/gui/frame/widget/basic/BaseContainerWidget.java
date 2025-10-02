@@ -4,9 +4,9 @@ import com.xkball.auto_translate.client.gui.frame.core.IPanel;
 import com.xkball.auto_translate.client.gui.frame.core.WidgetBoundary;
 import com.xkball.auto_translate.client.gui.frame.core.render.CombineRenderer;
 import com.xkball.auto_translate.client.gui.frame.core.render.IGUIDecoRenderer;
-import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public abstract class BaseContainerWidget extends AbstractContainerWidget implements IPanel {
     
@@ -40,15 +40,15 @@ public abstract class BaseContainerWidget extends AbstractContainerWidget implem
         return getBoundary().inner().y();
     }
     
-    @Override
-    public int getRight() {
-        return getBoundary().inner().maxX();
-    }
-    
-    @Override
-    public int getBottom() {
-        return getBoundary().inner().maxY();
-    }
+//    @Override
+//    public int getRight() {
+//        return getBoundary().inner().maxX();
+//    }
+//
+//    @Override
+//    public int getBottom() {
+//        return getBoundary().inner().maxY();
+//    }
     
     @Override
     public float getXPercentage() {
@@ -199,8 +199,8 @@ public abstract class BaseContainerWidget extends AbstractContainerWidget implem
 //    }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         return this.getChildAt(mouseX, mouseY)
-                .filter(p_293596_ -> p_293596_.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent();
+                .filter(p_293596_ -> p_293596_.mouseScrolled(mouseX, mouseY, scrollY)).isPresent();
     }
 }

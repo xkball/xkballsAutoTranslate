@@ -4,8 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.data.XATDataBase;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import javax.annotation.Nullable;
 
 public record LLMResponse(@Nullable JsonObject response) {
     

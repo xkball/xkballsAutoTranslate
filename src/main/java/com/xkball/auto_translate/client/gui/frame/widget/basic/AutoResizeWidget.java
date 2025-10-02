@@ -8,7 +8,8 @@ import com.xkball.auto_translate.client.gui.frame.core.render.IGUIDecoRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public abstract class AutoResizeWidget extends AbstractWidget implements IPanel {
     
@@ -52,15 +53,15 @@ public abstract class AutoResizeWidget extends AbstractWidget implements IPanel 
         return getBoundary().inner().y();
     }
     
-    @Override
-    public int getRight() {
-        return getBoundary().inner().maxX();
-    }
-    
-    @Override
-    public int getBottom() {
-        return getBoundary().inner().maxY();
-    }
+//    @Override
+//    public int getRight() {
+//        return getBoundary().inner().maxX();
+//    }
+//
+//    @Override
+//    public int getBottom() {
+//        return getBoundary().inner().maxY();
+//    }
     
     @Override
     public float getXPercentage() {

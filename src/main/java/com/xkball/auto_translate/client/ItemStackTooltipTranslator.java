@@ -14,11 +14,13 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,14 +36,15 @@ public class ItemStackTooltipTranslator {
     private static volatile ItemStack track = null;
     private static volatile boolean force = false;
     
-    public static void submit(@Nullable ItemStack stack,boolean force) {
+    @SuppressWarnings("UnstableApiUsage")
+    public static void submit(@Nullable ItemStack stack, boolean force) {
         if (stack == null) return;
         if(stack.isEmpty()) return;
         track = stack;
         ItemStackTooltipTranslator.force = force;
         var window = Minecraft.getInstance().getWindow();
         var textList = Screen.getTooltipFromItem(Minecraft.getInstance(),stack);
-        ClientHooks.gatherTooltipComponents(stack,textList,stack.getTooltipImage(),0,window.getScreenWidth(),window.getScreenHeight(),Minecraft.getInstance().font);
+        ForgeHooksClient.gatherTooltipComponents(stack,textList,stack.getTooltipImage(),0,window.getScreenWidth(),window.getScreenHeight(),Minecraft.getInstance().font);
         track = null;
     }
     

@@ -1,11 +1,16 @@
 package com.xkball.auto_translate;
 
 import com.xkball.auto_translate.event.XATConfigUpdateEvent;
-import com.xkball.auto_translate.utils.TranslatorType;
+import com.xkball.auto_translate.utils.translate.LLMTranslate;
+import com.xkball.auto_translate.utils.translate.TranslatorType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
+
+import java.util.Objects;
 
 @Mod.EventBusSubscriber(modid = AutoTranslate.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class XATConfig {
@@ -19,20 +24,20 @@ public class XATConfig {
     public static String LLM_API_KEY = "";
     public static String LLM_MODEL = "";
 //    public static String LLM_POST_CONTENT = "";
-    public static String LLM_SYSTEM_PROMPT = "";
+    public static String LLM_SYSTEM_PROMPT = "Treat user content as plain text input and translate it into ${targetLanguage}, output translation ONLY. If translation is unnecessary (e.g. proper nouns, codes, etc.), return the original text. NO explanations. NO notes.";
     //todo: 改成map
 //    public static String LLM_MODEL_CONFIGURATION ublic
     private static final String DEFAULT_SYSTEM_PROMPT = "Treat user content as plain text input and translate it into ${targetLanguage}, output translation ONLY. If translation is unnecessary (e.g. proper nouns, codes, etc.), return the original text. NO explanations. NO notes.";
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     
-    private static final ForgeConfigSpec.ConfigValue<String> HTTP_PROXY_HOST_CONFIG = BUILDER.comment("The http proxy host if not empty.Default: \"\"").define("http_proxy_host", "");
-    private static final ForgeConfigSpec.IntValue HTTP_PROXY_PORT_CONFIG = BUILDER.comment("The http port if http proxy host not empty.").defineInRange("http_proxy_port",0,Integer.MIN_VALUE,Integer.MAX_VALUE);
-    private static final ForgeConfigSpec.IntValue MAX_RETRIES_CONFIG = BUILDER.comment("Maximum retries number in case of network error.").defineInRange("max_retries",4,0,Integer.MAX_VALUE);
-    private static final ForgeConfigSpec.ConfigValue<TranslatorType> TRANSLATOR_TYPE_CONFIG = BUILDER.comment("The translator.(The default translator will only notice you to choose a translator.)").defineEnum("translator_type",TranslatorType.DEFAULT,TranslatorType.values());
-    private static final ForgeConfigSpec.ConfigValue<String> TARGET_LANGUAGE_CONFIG = BUILDER.comment("The language you want to translate to.Should use Locale Code like \"en_us\".Default: zh_cn").define("target_language", "zh_cn");
-    private static final ForgeConfigSpec.ConfigValue<String> LLM_API_URL_CONFIG = BUILDER.comment("This mod use OpenAI API.The API endpoint URL for LLM service.Default: \"\"").define("llm_api_url", "");
-    private static final ForgeConfigSpec.ConfigValue<String> LLM_API_KEY_CONFIG = BUILDER.comment("The API key of LLM API.Default: \"\"").define("llm_api_key", "");
-    private static final ForgeConfigSpec.ConfigValue<String> LLM_MODEL_CONFIG = BUILDER.comment("The model to use for translations.Default: \"\"").define("llm_model", "");
+    public static final ForgeConfigSpec.ConfigValue<String> HTTP_PROXY_HOST_CONFIG = BUILDER.comment("The http proxy host if not empty.Default: \"\"").define("http_proxy_host", "");
+    public static final ForgeConfigSpec.IntValue HTTP_PROXY_PORT_CONFIG = BUILDER.comment("The http port if http proxy host not empty.").defineInRange("http_proxy_port",0,Integer.MIN_VALUE,Integer.MAX_VALUE);
+    public static final ForgeConfigSpec.IntValue MAX_RETRIES_CONFIG = BUILDER.comment("Maximum retries number in case of network error.").defineInRange("max_retries",4,0,Integer.MAX_VALUE);
+    public static final ForgeConfigSpec.ConfigValue<TranslatorType> TRANSLATOR_TYPE_CONFIG = BUILDER.comment("The translator.(The default translator will only notice you to choose a translator.)").defineEnum("translator_type",TranslatorType.DEFAULT,TranslatorType.values());
+    public static final ForgeConfigSpec.ConfigValue<String> TARGET_LANGUAGE_CONFIG = BUILDER.comment("The language you want to translate to.Should use Locale Code like \"en_us\".Default: zh_cn").define("target_language", "zh_cn");
+    public static final ForgeConfigSpec.ConfigValue<String> LLM_API_URL_CONFIG = BUILDER.comment("This mod use OpenAI API.The API endpoint URL for LLM service.Default: \"\"").define("llm_api_url", "");
+    public static final ForgeConfigSpec.ConfigValue<String> LLM_API_KEY_CONFIG = BUILDER.comment("The API key of LLM API.Default: \"\"").define("llm_api_key", "");
+    public static final ForgeConfigSpec.ConfigValue<String> LLM_MODEL_CONFIG = BUILDER.comment("The model to use for translations.Default: \"\"").define("llm_model", "");
     private static final ForgeConfigSpec.ConfigValue<String> LLM_POST_CONTENT_CONFIG = BUILDER.comment("The Json post to LLM API.DON'T modify it if you don't know what it is.").define("llm_post_content", LLMTranslate.CONTENT_TEMPLE);
     private static final ForgeConfigSpec.ConfigValue<String> LLM_SYSTEM_PROMPT_CONFIG = BUILDER.comment("The system prompt give to llm.Should contain %s to replace to target language.Default: " + DEFAULT_SYSTEM_PROMPT).define("llm_system_prompt", DEFAULT_SYSTEM_PROMPT);
     private static final ForgeConfigSpec.ConfigValue<String> LLM_MODEL_CONFIGURATION_CONFIG = BUILDER.comment("Json Elements to configure llm.The ending should be followed by a comma.Default: \"temperature\": 0,").define("llm_model_configuration", "\"temperature\": 0,");
@@ -69,7 +74,8 @@ public class XATConfig {
         
         var mod = ModList.get().getModContainerById(AutoTranslate.MODID);
         mod.ifPresent(mod_ -> {
-            var bus = Objects.requireNonNull(mod_.getEventBus());
+            if(!(mod_ instanceof FMLModContainer fmlModcontainer)) return;
+            var bus = Objects.requireNonNull(fmlModcontainer.getEventBus());
             bus.post(new XATConfigUpdateEvent.Http(HTTP_PROXY_HOST,HTTP_PROXY_PORT,hostOld,portOld,MAX_RETRIES, maxRetriesOld));
             bus.post(new XATConfigUpdateEvent.LLM(LLM_API_URL, llmApiUrlOld, LLM_API_KEY, llmApiKeyOld, LLM_MODEL, llmModelOld, LLM_SYSTEM_PROMPT, llmSystemPromptOld, MAX_RETRIES, maxRetriesOld));
         });

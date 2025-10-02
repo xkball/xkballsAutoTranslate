@@ -1,7 +1,7 @@
 package com.xkball.auto_translate.data;
 
 import com.mojang.logging.LogUtils;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import java.sql.Connection;

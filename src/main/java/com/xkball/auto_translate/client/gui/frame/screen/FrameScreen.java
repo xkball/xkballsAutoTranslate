@@ -14,23 +14,21 @@ import com.xkball.auto_translate.client.gui.frame.widget.basic.AutoResizeWidgetW
 import com.xkball.auto_translate.client.gui.frame.widget.basic.HorizontalPanel;
 import com.xkball.auto_translate.client.gui.frame.widget.basic.VerticalPanel;
 import com.xkball.auto_translate.client.gui.widget.ObjectInputBox;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
+
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -81,7 +79,7 @@ public class FrameScreen extends Screen implements IUpdateMarker {
         while (!renderTasks.isEmpty()) {
             renderTasks.poll().run();
         }
-        if (AutoTranslate.IS_DEBUG && Minecraft.getInstance().getDebugOverlay().showDebugScreen()){
+        if (AutoTranslate.IS_DEBUG && Minecraft.getInstance().options.renderDebug){
             guiGraphics.drawString(font,mouseX + ":" + mouseY, 10, 10, -1);
         }
     }
@@ -156,22 +154,12 @@ public class FrameScreen extends Screen implements IUpdateMarker {
     public static void setupSimpleEditBox(EditBox editBox) {
         editBox.setMaxLength(114514);
         editBox.setCanLoseFocus(true);
-        editBox.scrollTo(0);
+        editBox.moveCursorToStart();
     }
     
     public static AutoResizeWidgetWrapper iconButton(Button.OnPress onPress, ResourceLocation sprite) {
-        var btn = SpriteIconButton.builder(Component.empty(), onPress, true)
-                .sprite(sprite, 16, 16)
-                .build();
+        var btn = new ImageButton(0,0,0,0,0,0,0,sprite,16,16,onPress,Component.empty());
         return AutoResizeWidgetWrapper.of(btn);
-    }
-    
-    public static AutoResizeWidgetWrapper createCheckBox(Component message, BooleanSupplier valueGetter, BooleanConsumer valueSetter) {
-        var checkBox = Checkbox.builder(message, Minecraft.getInstance().font)
-                .onValueChange((c, b) -> valueSetter.accept(b))
-                .build();
-        if (valueGetter.getAsBoolean() != checkBox.selected()) checkBox.onPress();
-        return AutoResizeWidgetWrapper.of(checkBox);
     }
     
     public static AutoResizeWidgetWrapper createButton(String message, Runnable onPress) {

@@ -8,15 +8,15 @@ import com.xkball.auto_translate.llm.LLMClientImpl;
 import com.xkball.auto_translate.llm.LLMRequest;
 import com.xkball.auto_translate.llm.LLMResponse;
 import net.minecraft.client.resources.language.I18n;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class LLMTranslate implements ITranslator {
     
     public static final LLMTranslate INSTANCE = new LLMTranslate();

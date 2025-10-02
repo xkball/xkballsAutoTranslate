@@ -7,8 +7,8 @@ import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
 import com.xkball.auto_translate.event.XATConfigUpdateEvent;
 import net.minecraft.client.resources.language.I18n;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GoogleTranslate implements ITranslator {
     
     private static final URI THE_URI = URI.create("https://translate.google.com");

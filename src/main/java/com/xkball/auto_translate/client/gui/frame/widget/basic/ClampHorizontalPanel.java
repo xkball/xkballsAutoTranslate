@@ -4,8 +4,8 @@ import com.xkball.auto_translate.client.gui.frame.core.HorizontalAlign;
 import com.xkball.auto_translate.client.gui.frame.core.IPanel;
 import com.xkball.auto_translate.client.gui.frame.core.WidgetPos;
 import net.minecraft.client.gui.components.AbstractWidget;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;

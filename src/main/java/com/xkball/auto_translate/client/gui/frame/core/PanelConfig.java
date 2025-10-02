@@ -5,7 +5,9 @@ import com.xkball.auto_translate.client.gui.frame.core.render.IGUIDecoRenderer;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
+
 
 public class PanelConfig {
     

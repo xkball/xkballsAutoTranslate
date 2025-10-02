@@ -19,7 +19,6 @@ import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.joml.Vector2f;
@@ -89,7 +88,7 @@ public class ScrollableVerticalPanel extends VerticalPanel {
                 GuiDecorations.GRAY_BORDER.render(guiGraphics, boundary, mouseX, mouseY, partialTicks);
             }
         } else
-            guiGraphics.fill(selected.getX(), selected.getY(), selected.getRight(), selected.getBottom(), VanillaUtils.GUI_GRAY);
+            guiGraphics.fill(selected.getX(), selected.getY(), selected.getX()+selected.getWidth(), selected.getY()+selected.getHeight(), VanillaUtils.GUI_GRAY);
     }
     
     public int getBoundaryHeight() {
@@ -127,10 +126,10 @@ public class ScrollableVerticalPanel extends VerticalPanel {
             var widgetRec = widget.getRectangle();
             widget.isHovered =  actualMouse.x >= widget.getX()
                     && actualMouse.y >= widget.getY()
-                    && actualMouse.x < widget.getRight()
-                    && actualMouse.y < widget.getBottom();
+                    && actualMouse.x < widget.getX()+widget.getWidth()
+                    && actualMouse.y < widget.getY()+widget.getHeight();
             ((MixinAbstractWidgetAccess)(widget)).invokeRenderWidget(guiGraphics, mouseX, (int) actualMouse.y, partialTick);
-            this.refreshScrollWidgetTooltip(widget.tooltip.get(), widget.isHovered(), widget.isFocused(),
+            this.refreshScrollWidgetTooltip(widget.getTooltip(), widget.isHovered(), widget.isFocused(),
                     new ScreenRectangle(new ScreenPosition(widgetRec.left(), (int) (widgetRec.top()-scrollAmount)),widgetRec.width(),widgetRec.height()));
         }
         renderDecoration(guiGraphics, mouseX, mouseY, partialTick);
@@ -149,8 +148,8 @@ public class ScrollableVerticalPanel extends VerticalPanel {
             }
             
             RenderSystem.enableBlend();
-            guiGraphics.blitSprite(SCROLLER_BACKGROUND_SPRITE, l, y, 6, h);
-            guiGraphics.blitSprite(SCROLLER_SPRITE, l, k, 6, i1);
+            guiGraphics.blit(SCROLLER_BACKGROUND_SPRITE, l, y, 0, 0, 6, h);
+            guiGraphics.blit(SCROLLER_SPRITE, l, k, 0, 0, 6, i1);
             RenderSystem.disableBlend();
            
         }
@@ -274,7 +273,7 @@ public class ScrollableVerticalPanel extends VerticalPanel {
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         //todo[xkball] 支持滚动组件内的滚动组件
         this.setScrollAmount(this.scrollAmount - scrollY * 10);
         return true;

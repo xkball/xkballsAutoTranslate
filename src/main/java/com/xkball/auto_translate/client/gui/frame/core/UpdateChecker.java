@@ -1,6 +1,6 @@
 package com.xkball.auto_translate.client.gui.frame.core;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public class UpdateChecker {
     

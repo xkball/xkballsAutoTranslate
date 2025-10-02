@@ -23,10 +23,10 @@ import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import org.jetbrains.annotations.Nullable;
+import net.minecraftforge.common.ForgeConfigSpec;
 
+
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,7 +41,7 @@ public class XATConfigScreen extends FrameScreen {
     private final Screen parentScreen;
     private final LangKeyTranslateUnit translateUnit = new LangKeyTranslateUnit();
     
-    public XATConfigScreen(@Nullable ModContainer container,@Nullable Screen parent) {
+    public XATConfigScreen(@Nullable Screen parent) {
         super(Component.empty());
         this.parentScreen = parent;
     }
@@ -196,7 +196,7 @@ public class XATConfigScreen extends FrameScreen {
         this.translateUnit.start();
     }
     
-    public <T> AutoResizeWidgetWrapper saveButton(Supplier<T> supplier, ModConfigSpec.ConfigValue<T> config){
+    public <T> AutoResizeWidgetWrapper saveButton(Supplier<T> supplier, ForgeConfigSpec.ConfigValue<T> config){
         return iconButton((btn) -> {
             var t = supplier.get();
             if(t == null) return;
@@ -205,11 +205,11 @@ public class XATConfigScreen extends FrameScreen {
         }, VanillaUtils.modRL("icon/save"));
     }
     
-    public <T> BaseContainerWidget createEntry(String key, ModConfigSpec.ConfigValue<T> config, Supplier<ObjectInputBox<T>> inputBSupplier){
+    public <T> BaseContainerWidget createEntry(String key, ForgeConfigSpec.ConfigValue<T> config, Supplier<ObjectInputBox<T>> inputBSupplier){
         var input = inputBSupplier.get();
         FrameScreen.setupSimpleEditBox(input);
         input.setValue(config.get().toString());
-        input.scrollTo(0);
+        input.moveCursorToStart();
         return createEntry_(key,AutoResizeWidgetWrapper.of(input),saveButton(input::get,config));
     }
     
@@ -218,7 +218,7 @@ public class XATConfigScreen extends FrameScreen {
         var config = XATConfig.TARGET_LANGUAGE_CONFIG;
         FrameScreen.setupSimpleEditBox(input);
         input.setValue(config.get());
-        input.scrollTo(0);
+        input.moveCursorToStart();
         var syncButton = FrameScreen.iconButton(btn -> input.setValue(Minecraft.getInstance().getLanguageManager().getSelected()),VanillaUtils.modRL("icon/sync"));
         var panel = new HorizontalPanel()
                 .addWidget(PanelConfig.of(-28,1)
@@ -231,12 +231,12 @@ public class XATConfigScreen extends FrameScreen {
         return createEntry_("xat.gui.config.target",panel,saveButton(input::get,config));
     }
     
-    public <T extends Enum<T>> BaseContainerWidget createEntryEnum(String key, ModConfigSpec.ConfigValue<T> config, Class<T> enumValue){
+    public <T extends Enum<T>> BaseContainerWidget createEntryEnum(String key, ForgeConfigSpec.ConfigValue<T> config, Class<T> enumValue){
         var btn = new CycleButton.Builder<T>((t) -> Component.literal(t.toString()))
                 .withValues(enumValue.getEnumConstants())
                 .withInitialValue(config.get())
                 .displayOnlyValue()
-                .create(Component.empty(),(cbt,t) -> {});
+                .create(0,0,0,0,Component.empty(),(cbt,t) -> {});
         return createEntry_(key,AutoResizeWidgetWrapper.of(btn),saveButton(btn::getValue,config));
     }
     

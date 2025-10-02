@@ -7,7 +7,7 @@ import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.utils.ClientUtils;
 import com.xkball.auto_translate.utils.VanillaUtils;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,6 +30,7 @@ import static net.minecraft.client.gui.screens.inventory.BookViewScreen.BOOK_LOC
 
 @Mixin(BookViewScreen.class)
 @SuppressWarnings("AddedMixinMembersNamePattern")
+@ParametersAreNonnullByDefault
 public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
     
     @Shadow private List<FormattedCharSequence> cachedPageComponents;
@@ -46,14 +48,13 @@ public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
     
     @Inject(method = "init",at = @At("RETURN"))
     public void onInit(CallbackInfo ci){
-        var xat_btn = SpriteIconButton.builder(Component.empty(), b -> {
+        var xat_btn = new ImageButton(this.width / 2 + 100 + 8, 196,20, 20,
+                0,0,0,VanillaUtils.modRL("icon/xat_icon"), 16, 16,
+                 b -> {
                     xat_tr.set(!xat_tr.get());
                     if(xat_tr.get()) this.submit(false);
-                }, true)
-                .sprite(VanillaUtils.modRL("icon/xat_icon"), 16, 16)
-                .build();
+                },Component.empty());
         xat_btn.setTooltip(Tooltip.create(Component.translatable("xat.gui.toggle_translate")));
-        xat_btn.setRectangle(20, 20, this.width / 2 + 100 + 8, 196);
         this.addRenderableWidget(xat_btn);
     }
     
@@ -77,8 +78,9 @@ public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
         }
     }
     
-    @Inject(method = "renderBackground",at = @At("RETURN"))
-    public void onRenderBg(GuiGraphics guiGraphics, int p_296491_, int p_294260_, float p_294869_, CallbackInfo ci){
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics) {
+        super.renderBackground(guiGraphics);
         if(xat_tr.get()){
             guiGraphics.blit(BOOK_LOCATION, (this.width - 192) / 2 + 146, 2, 0.0F, 0.0F, 192, 192, 256, 256);
         }

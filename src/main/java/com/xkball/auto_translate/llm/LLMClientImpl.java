@@ -8,8 +8,8 @@ import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.event.XATConfigUpdateEvent;
 import com.xkball.auto_translate.utils.HttpUtils;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -23,8 +23,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
@@ -32,7 +34,8 @@ public class LLMClientImpl {
     
     private static volatile HttpClient CLIENT = HttpHandler.createClient();
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Executor EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
+    private static final Executor EXECUTOR = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+            6L, TimeUnit.SECONDS, new SynchronousQueue<>());
     private final Semaphore semaphore = new Semaphore(8);
     private final String url;
     private final String apiKey;
@@ -115,7 +118,7 @@ public class LLMClientImpl {
         }
         else {
             if(retries > 0){
-                LockSupport.parkNanos(2000000);
+                LockSupport.parkNanos(200000);
             }
             CompletableFuture.runAsync(semaphore::acquireUninterruptibly,EXECUTOR)
                     .thenCompose(ignore -> sendAsync(req,handler::handle))
@@ -148,7 +151,7 @@ public class LLMClientImpl {
         }
     }
     
-    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class HttpHandler {
         
         public static HttpClient createClient() {

@@ -1,6 +1,5 @@
 package com.xkball.auto_translate.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -26,15 +25,15 @@ public class MixinGuiGraphics implements IExtendedGuiGraphics {
     @Unique
     private final LinkedList<Vector2i> xkball_sAutoTranslate$offsetStack = new LinkedList<>();
 
-    @WrapMethod(method = "containsPointInScissor")
-    public boolean wrapContainsPointInScissor(int x, int y, Operation<Boolean> original){
-        if(!xkball_sAutoTranslate$offsetStack.isEmpty()){
-            var p = xkball_sAutoTranslate$offsetStack.peek();
-            x -= p.x;
-            y -= p.y;
-        }
-        return original.call(x, y);
-    }
+//    @WrapMethod(method = "containsPointInScissor")
+//    public boolean wrapContainsPointInScissor(int x, int y, Operation<Boolean> original){
+//        if(!xkball_sAutoTranslate$offsetStack.isEmpty()){
+//            var p = xkball_sAutoTranslate$offsetStack.peek();
+//            x -= p.x;
+//            y -= p.y;
+//        }
+//        return original.call(x, y);
+//    }
     
     @Override
     public void xat_pushOffset(int x, int y) {

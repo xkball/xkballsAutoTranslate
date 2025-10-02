@@ -140,7 +140,7 @@ public interface IPanel {
     }
     
     default void recordDebugBoundary(WidgetBoundary boundary) {
-        if (AutoTranslate.IS_DEBUG && Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
+        if (AutoTranslate.IS_DEBUG && Minecraft.getInstance().options.renderDebug) {
             var od = boundary.outer();
             var id = boundary.inner();
             var blue0 = VanillaUtils.getColor(173, 216, 230, 10);

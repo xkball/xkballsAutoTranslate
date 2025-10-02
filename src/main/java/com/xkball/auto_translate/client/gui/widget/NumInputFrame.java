@@ -11,8 +11,8 @@ import com.xkball.auto_translate.client.gui.frame.widget.basic.ClampHorizontalPa
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
 

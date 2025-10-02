@@ -1,9 +1,9 @@
 package com.xkball.auto_translate.event;
 
-import net.neoforged.bus.api.Event;
-import net.neoforged.fml.event.IModBusEvent;
-import org.jetbrains.annotations.Nullable;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.fml.event.IModBusEvent;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class XATConfigUpdateEvent extends Event implements IModBusEvent {

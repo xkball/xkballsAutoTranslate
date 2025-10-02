@@ -7,8 +7,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class AutoResizeWidgetWrapper extends BaseContainerWidget {
@@ -86,7 +86,8 @@ public class AutoResizeWidgetWrapper extends BaseContainerWidget {
     public void setBoundary(WidgetBoundary boundary) {
         this.widgetBoundary = boundary;
         this.inner.setPosition(boundary.inner().x(), boundary.inner().y());
-        this.inner.setSize(boundary.inner().width(), boundary.inner().height());
+        this.inner.setWidth(boundary.inner().width());
+        this.inner.setHeight(boundary.inner().height());
         this.width = boundary.inner().width();
         this.height = boundary.inner().height();
     }

@@ -1,10 +1,8 @@
 package com.xkball.auto_translate.client.gui.frame.core;
 
 import com.mojang.serialization.Codec;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+
 import net.minecraft.util.StringRepresentable;
 
 public enum HorizontalAlign implements StringRepresentable {
@@ -13,7 +11,6 @@ public enum HorizontalAlign implements StringRepresentable {
     RIGHT(Component.translatable("let_me_see_see.gui.align_right"));
     
     public static final Codec<HorizontalAlign> CODEC = StringRepresentable.fromEnum(HorizontalAlign::values);
-    public static final StreamCodec<ByteBuf, HorizontalAlign> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
     
     private static final HorizontalAlign[] VALUES = HorizontalAlign.values();
     public final Component displayName;
