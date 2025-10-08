@@ -27,6 +27,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,7 +41,7 @@ public class XATConfigScreen extends FrameScreen {
             .paddingLeft(0.25f);
     @Nullable
     private final Screen parentScreen;
-    private final LangKeyTranslateUnit translateUnit = new LangKeyTranslateUnit();
+    private static final LangKeyTranslateUnit translateUnit = new LangKeyTranslateUnit();
     
     public XATConfigScreen(@Nullable ModContainer container,@Nullable Screen parent) {
         super(Component.empty());
@@ -145,7 +147,7 @@ public class XATConfigScreen extends FrameScreen {
     public BaseContainerWidget createRunTransKeys(){
         var btn1 = FrameScreen.createButton("xat.gui.btn.run_trans_keys", this::runTransKeys);
         var btn2 = FrameScreen.createButton("xat.gui.btn.cancel_inject_lang", () -> {
-            this.translateUnit.cancel();
+            translateUnit.cancel();
             XATDataBase.INSTANCE.enableInjectLang(false);
             AutoTranslate.cancelInjectLanguage();
             XATConfigScreen.this.setNeedUpdate();
@@ -173,7 +175,7 @@ public class XATConfigScreen extends FrameScreen {
     }
     
     public void runTransKeys(){
-        this.translateUnit.reset();
+        translateUnit.reset();
         XATConfigScreen.this.setNeedUpdate();
         XATDataBase.INSTANCE.enableInjectLang(true);
         var en = ClientUtils.getClientLanguage("en_us");
@@ -187,13 +189,24 @@ public class XATConfigScreen extends FrameScreen {
             AutoTranslate.injectLanguage();
             return;
         }
-        IntStream.range(0, diff.size())
+        var diff1 = new ArrayList<Map.Entry<String,String>>();
+        var diff2 = new ArrayList<Map.Entry<String,String>>();
+        for(var entry : diff){
+            if(entry.getValue().startsWith("%") || entry.getValue().startsWith("-")){
+                diff2.add(entry);
+            }
+            else {
+                diff1.add(entry);
+            }
+        }
+        IntStream.range(0, diff1.size())
                 .boxed()
                 .collect(Collectors.groupingBy(i -> i / 20))
                 .values().stream()
                 .map(indexes -> indexes.stream().map(diff::get).toList())
                 .forEach(translateUnit::submitRequest);
-        this.translateUnit.start();
+        diff2.forEach(entry -> translateUnit.submitRequest(entry.getKey(), entry.getValue()));
+        translateUnit.start();
     }
     
     public <T> AutoResizeWidgetWrapper saveButton(Supplier<T> supplier, ModConfigSpec.ConfigValue<T> config){
