@@ -82,7 +82,8 @@ public class CrossModBridge {
         
         private static CompletableFuture<Void> translate(String str,boolean force){
             if(str.isEmpty()) return CompletableFuture.completedFuture(null);
-            if(!force && FTBQ_CACHE.getOrDefault(str) != null) return CompletableFuture.completedFuture(null);
+            if(!force && FTBQ_CACHE.get(str) != null) return CompletableFuture.completedFuture(null);
+            FTBQ_CACHE.putTranslating(str);
             return XATConfig.TRANSLATOR_TYPE.getTranslator().translate(str).thenAcceptAsync(result -> FTBQ_CACHE.put(str,result));
         }
     }

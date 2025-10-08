@@ -9,16 +9,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class TranslationCacheSlice {
     
     private final Connection conn;
+    private final Set<String> translating = new HashSet<>();
     public final String tableName;
+    
     
     public TranslationCacheSlice(Connection conn, String tableName) {
         this.conn = conn;
         this.tableName = tableName;
+    }
+    
+    public void putTranslating(String key){
+        translating.add(key);
     }
     
     public String get(String key){
@@ -34,10 +42,12 @@ public class TranslationCacheSlice {
     
     public String getOrDefault(String key){
         var result = get(key);
-        return result != null ? result : I18n.get(ITranslator.TRANSLATING_KEY);
+        if (result != null) return result;
+        return translating.contains(key) ? I18n.get(ITranslator.TRANSLATING_KEY) : null;
     }
     
     public void put(String key, String value){
+        translating.remove(key);
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO " + tableName + " (key, value) VALUES (?, ?) " +
                         "ON CONFLICT(key) DO UPDATE SET value=excluded.value")) {

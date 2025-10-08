@@ -1,9 +1,13 @@
 package com.xkball.auto_translate.utils.translate;
 
 import com.mojang.logging.LogUtils;
+import com.xkball.auto_translate.XATConfig;
+import com.xkball.auto_translate.api.ILangKeyTrContext;
 import com.xkball.auto_translate.llm.ILLMHandler;
+import com.xkball.auto_translate.llm.LLMRequest;
 import com.xkball.auto_translate.llm.LLMResponse;
 import com.xkball.auto_translate.utils.LegacyUtils;
+import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -11,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LangKeyTranslateContext implements ILLMHandler {
+public class GroupLangKeyTranslateContext implements ILangKeyTrContext {
     
     private static final Logger LOGGER = LogUtils.getLogger();
     
@@ -21,7 +25,7 @@ public class LangKeyTranslateContext implements ILLMHandler {
     public final Map<String, String> raw = new HashMap<>();
     public final Map<String, String> result = new HashMap<>();
     
-    public LangKeyTranslateContext(List<Map.Entry<String, String>> elt, LangKeyTranslateUnit unit) {
+    public GroupLangKeyTranslateContext(List<Map.Entry<String, String>> elt, LangKeyTranslateUnit unit) {
         this.unit = unit;
         for (Map.Entry<String, String> entry : elt) {
             if (entry.getValue().isEmpty()) {
@@ -42,8 +46,20 @@ public class LangKeyTranslateContext implements ILLMHandler {
         return LegacyUtils.toYaml(items);
     }
     
+    @Override
     public Map<String, String> getRawMap(){
         return raw;
+    }
+    
+    @Override
+    public Map<String, String> getResultMap() {
+        return result;
+    }
+    
+    @Override
+    public LLMRequest createLLMRequest() {
+        var sp = StrSubstitutor.replace(LangKeyTranslateUnit.DEFAULT_OPENAI_MULTIPLE_PROMPT, Map.of("targetLanguage", XATConfig.TARGET_LANGUAGE));
+        return new LLMRequest(sp,createLLMRequestUserPrompt());
     }
     
     @Override
