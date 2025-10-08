@@ -27,6 +27,8 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
