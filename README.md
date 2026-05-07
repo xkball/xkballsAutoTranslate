@@ -20,12 +20,12 @@ Now this mod have three translators:
 
 ## Feature List 功能列表
 
-| Minecraft Version | Mod Version | ConfigScreen | Translate Item Tooltip | Translate  FTBQ | Translate  Book |
-| ----------------- | ----------- | ------------ | ---------------------- | --------------- | --------------- |
-| 1.21.4/NeoForge   | 1.1.4       | ✅            | ✅                      |                 | ✅               |
-| 1.21.1/NeoForge   | 1.0.4       | ✅            | ✅                      | ✅               | ✅               |
-| 1.20.1/Forge      | 1.-1.3      |              | ✅                      | ✅               |                 |
-| 1.19.2/Forge      | 1.-2.3      |              | ✅                      | ✅               |                 |
+| Minecraft Version | Mod Version | Config Screen | External Cache | Translate Item Tooltip | Translate  FTBQ | Translate  Written Book |
+| ----------------- | ----------- | ------------- | -------------- | ---------------------- | --------------- | ----------------------- |
+| 1.21.4/NeoForge   | 1.1.4       | ✅             | ✅              | ✅                      |                 | ✅                       |
+| 1.21.1/NeoForge   | 1.0.4       | ✅             | ✅              | ✅                      | ✅               | ✅                       |
+| 1.20.1/Forge      | 1.-1.3      |               |                | ✅                      | ✅               |                         |
+| 1.19.2/Forge      | 1.-2.3      |               |                | ✅                      | ✅               |                         |
 
 
 ## Demonstrate  效果展示
