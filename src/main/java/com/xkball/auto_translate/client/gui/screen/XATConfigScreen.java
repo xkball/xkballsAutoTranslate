@@ -15,7 +15,9 @@ import com.xkball.xklib.ui.widget.container.ContainerWidget;
 import com.xkball.xklibmc.ui.XKLibBaseScreen;
 import com.xkball.xklibmc.ui.widget.WidgetWrapper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -26,7 +28,8 @@ import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,58 +42,28 @@ public class XATConfigScreen extends XKLibBaseScreen {
     private ContainerWidget scrollContent;
     private ContainerWidget processingBarRow;
     private ContainerWidget runTransKeysRow;
-    private WidgetWrapper syncButton;
+
 
     public XATConfigScreen(@Nullable ModContainer container, @Nullable Screen parent) {
         super(Component.empty());
         this.parentScreen = parent;
         AutoTranslate.onUpdate = this::onDynamicUpdate;
-        
-        var root = new ContainerWidget();
-        root.inlineStyle("size: 100% 100%; flex-direction: column;");
-        root.asRootStyle("""
-                * {
-                    flex-shrink: 0;
-                }
-                Label {
-                    text-color: -1;
-                    text-height: 10rpx;
-                }
-                """);
-        
-        root.addChild(createTitleBar());
-        
-        scrollContent = new ContainerWidget();
-        scrollContent.inlineStyle("""
-                size: 100% 100%-36rpx;
-                flex-direction: column;
-                overflow-y: scroll;
-                scrollbar-width: 8;
-                """);
-        
-        scrollContent.addChild(createConfigTitle("xat.gui.config.title.network"));
-        scrollContent.addChild(createEntry("xat.gui.config.http_host", XATConfig.HTTP_PROXY_HOST_CONFIG, () -> createInput(ObjectInputBox.PASS_VALIDATOR, ObjectInputBox.PASS_RESPONDER)));
-        scrollContent.addChild(createEntry("xat.gui.config.http_port", XATConfig.HTTP_PROXY_PORT_CONFIG, () -> createInput(ObjectInputBox.INT_VALIDATOR, ObjectInputBox.INT_RESPONDER)));
-        scrollContent.addChild(createEntry("xat.gui.config.max_retries", XATConfig.MAX_RETRIES_CONFIG, () -> createInput(ObjectInputBox.INT_VALIDATOR, ObjectInputBox.INT_RESPONDER)));
-        scrollContent.addChild(createConfigTitle("xat.gui.config.title.translator"));
-        scrollContent.addChild(createEntryEnum("xat.gui.config.translator", XATConfig.TRANSLATOR_TYPE_CONFIG, TranslatorType.class));
-        scrollContent.addChild(createTargetEntry());
-        scrollContent.addChild(createConfigTitle("xat.gui.config.title.llm_config"));
-        scrollContent.addChild(createEntry("xat.gui.config.llm_api_url", XATConfig.LLM_API_URL_CONFIG, () -> createInput(ObjectInputBox.PASS_VALIDATOR, ObjectInputBox.PASS_RESPONDER)));
-        scrollContent.addChild(createEntry("xat.gui.config.llm_model", XATConfig.LLM_MODEL_CONFIG, () -> createInput(ObjectInputBox.PASS_VALIDATOR, ObjectInputBox.PASS_RESPONDER)));
-        scrollContent.addChild(createAPIKeyInput());
-        scrollContent.addChild(createConfigTitle("xat.gui.run_trans_keys"));
-        scrollContent.addChild(addNotice("xat.gui.config.run_trans_notice"));
-        scrollContent.addChild(createRunTransKeys());
-        scrollContent.addChild(createProcessingBar());
-        scrollContent.addChild(createConfigTitle("xat.gui.config.title.others"));
-        scrollContent.addChild(createTokenCostLabel());
-        scrollContent.addChild(createClearAllButton());
-        
-        root.addChild(scrollContent);
-        
-        root.addChild(createBottomBar());
-        
+
+        var root = new ContainerWidget()
+                .inlineStyle("size: 100% 100%; flex-direction: column;")
+                .asRootStyle("""
+                        * {
+                            flex-shrink: 0;
+                        }
+                        Label {
+                            text-color: -1;
+                            text-height: 10rpx;
+                        }
+                        """)
+                .addChild(createTitleBar())
+                .addChild(rebuildContent())
+                .addChild(createBottomBar());
+
         this.addScreenLayer(root);
     }
 
@@ -98,127 +71,144 @@ public class XATConfigScreen extends XKLibBaseScreen {
     protected void init() {
         super.init();
     }
+    
+    private Widget rebuildContent(){
+        if(scrollContent == null){
+            scrollContent = new ContainerWidget()
+                    .inlineStyle("""
+                        size: 100% 100%-36rpx;
+                        flex-direction: column;
+                        overflow-y: scroll;
+                        scrollbar-width: 8;
+                        """);
+        }
+        else {
+            scrollContent.clearChildren();
+        }
+        scrollContent
+                .addChild(createConfigTitle("xat.gui.config.title.network"))
+                .addChild(createEntry("xat.gui.config.http_host", XATConfig.HTTP_PROXY_HOST_CONFIG, () -> createInput(ObjectInputBox.PASS_VALIDATOR, ObjectInputBox.PASS_RESPONDER)))
+                .addChild(createEntry("xat.gui.config.http_port", XATConfig.HTTP_PROXY_PORT_CONFIG, () -> createInput(ObjectInputBox.INT_VALIDATOR, ObjectInputBox.INT_RESPONDER)))
+                .addChild(createEntry("xat.gui.config.max_retries", XATConfig.MAX_RETRIES_CONFIG, () -> createInput(ObjectInputBox.INT_VALIDATOR, ObjectInputBox.INT_RESPONDER)))
+                .addChild(createConfigTitle("xat.gui.config.title.translator"))
+                .addChild(createEntryEnum("xat.gui.config.translator", XATConfig.TRANSLATOR_TYPE_CONFIG, TranslatorType.class))
+                .addChild(createTargetEntry());
+        if(XATConfig.TRANSLATOR_TYPE_CONFIG.get() == TranslatorType.LLM){
+            scrollContent
+                    .addChild(createConfigTitle("xat.gui.config.title.llm_config"))
+                    .addChild(createEntry("xat.gui.config.llm_api_url", XATConfig.LLM_API_URL_CONFIG, () -> createInput(ObjectInputBox.PASS_VALIDATOR, ObjectInputBox.PASS_RESPONDER)))
+                    .addChild(createEntry("xat.gui.config.llm_model", XATConfig.LLM_MODEL_CONFIG, () -> createInput(ObjectInputBox.PASS_VALIDATOR, ObjectInputBox.PASS_RESPONDER)))
+                    .addChild(createAPIKeyInput());
+        }
+        scrollContent
+                .addChild(createConfigTitle("xat.gui.run_trans_keys"))
+                .addChild(addNotice("xat.gui.config.run_trans_notice"))
+                .addChild(createRunTransKeys())
+                .addChild(createProcessingBar())
+                .addChild(createConfigTitle("xat.gui.config.title.others"))
+                .addChild(createTokenCostLabel())
+                .addChild(createClearAllButton());
+        return scrollContent;
+    }
 
     private ContainerWidget createTitleBar() {
-        var bar = new ContainerWidget();
-        bar.inlineStyle("""
-                size: 100% 24rpx;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-shrink: 0;
-                justify-content: center;
-                background-color: 0xaa222222;
-                """);
-
-        var title = new Label(IComponent.translatable("xat.gui.config"));
-        title.inlineStyle("size: content 20rpx; text-align: center; text-scale: expand-width;");
-        bar.addChild(title);
+        var title = (Label) new Label(IComponent.translatable("xat.gui.config"))
+                .inlineStyle("size: content 20rpx; text-align: center; text-scale: expand-width; margin-left: 10rpx;");
 
         var openConfigBtn = new WidgetWrapper(
-                net.minecraft.client.gui.components.Button.builder(
-                        Component.translatable("xat.gui.open_config_file"),
-                        _ -> {
-                            try {
-                                var file = FMLPaths.CONFIGDIR.get().resolve("xkball_s_auto_translate-common.toml").toFile();
-                                Util.getPlatform().openFile(file);
-                            } catch (Exception ignored) {}
-                        }
-                ).bounds(0, 0, 20, 20).build()
-        );
-        openConfigBtn.inlineStyle("size: 10% 20rpx; min-width: 20rpx;margin-left: auto; margin-right: 10rpx;");
-        bar.addChild(openConfigBtn);
+                Button.builder(
+                                Component.translatable("xat.gui.open_config_file"),
+                                _ -> {
+                                    try {
+                                        var file = FMLPaths.CONFIGDIR.get().resolve("xkball_s_auto_translate-common.toml").toFile();
+                                        Util.getPlatform().openFile(file);
+                                    } catch (Exception ignored) {}
+                                })
+                        .bounds(0, 0, 20, 20).build())
+                .inlineStyle("size: 10% 20rpx; min-width: 20rpx;margin-left: auto; margin-right: 10rpx;");
 
-        return bar;
+        return new ContainerWidget()
+                .inlineStyle("""
+                        size: 100% 24rpx;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        flex-shrink: 0;
+                        justify-content: center;
+                        background-color: 0xaa222222;
+                        """)
+                .addChild(title)
+                .addChild(openConfigBtn);
     }
 
     private ContainerWidget createBottomBar() {
-        var bar = new ContainerWidget();
-        bar.inlineStyle("size: 100% 16rpx; flex-shrink: 0; background-color: 0xaa222222;");
-        return bar;
+        return new ContainerWidget()
+                .inlineStyle("size: 100% 16rpx; flex-shrink: 0; background-color: 0xaa222222;");
     }
 
     private Label createConfigTitle(String key) {
-        var label = new Label(IComponent.translatable(key));
-        label.inlineStyle("margin-top: 12rpx; margin-left: 20%;");
-        return label;
+        return (Label) new Label(IComponent.translatable(key))
+                .inlineStyle("margin-top: 8rpx; margin-bottom: 8rpx; margin-left: 20%; height: 10rpx;");
     }
 
-    private ContainerWidget addNotice(String key) {
-        var row = new ContainerWidget();
-        row.inlineStyle("display: flex; flex-direction: row; height: 10rpx;");
-        var label = new Label(IComponent.translatable(key));
-        label.inlineStyle("size: 100% auto;");
-        row.addChild(label);
-        return row;
+    private Label addNotice(String key) {
+        return (Label) new Label(IComponent.translatable(key))
+                .inlineStyle("margin-top: 4rpx; margin-bottom: 4rpx; margin-left: 25%; height: 10rpx");
     }
 
-    private ContainerWidget createTokenCostLabel() {
-        var row = new ContainerWidget();
-        row.inlineStyle("display: flex; flex-direction: row; height: 10rpx;");
-        var label = new Label(IComponent.translatable("xat.gui.token_cost", XATDataBase.INSTANCE.getTokenCost()));
-        label.inlineStyle("size: 100% auto;");
-        row.addChild(label);
-        return row;
+    private Label createTokenCostLabel() {
+        return (Label) new Label(IComponent.translatable("xat.gui.token_cost", XATDataBase.INSTANCE.getTokenCost()))
+                .inlineStyle("margin-top: 4rpx; margin-left: 25%;");
     }
 
-    private ContainerWidget createClearAllButton() {
-        var row = new ContainerWidget();
-        row.inlineStyle("display: flex; flex-direction: row; height: 40rpx;");
-        var btn = WidgetWrapper.button(Component.translatable("xat.gui.btn.clear_all_cache"), b -> XATDataBase.INSTANCE.clearAllTranslateCache());
-        btn.inlineStyle("size: 100% 20rpx; margin-left: 8rpx; margin-right: 8rpx;");
-        row.addChild(btn);
-        return row;
+    private WidgetWrapper createClearAllButton() {
+        return WidgetWrapper.button(Component.translatable("xat.gui.btn.clear_all_cache"), b -> XATDataBase.INSTANCE.clearAllTranslateCache())
+                .inlineStyle("height: 20rpx; margin-top: 4rpx; margin-left: 25%; width: 50%;");
     }
 
     private ContainerWidget createProcessingBar() {
-        processingBarRow = new ContainerWidget();
-        processingBarRow.inlineStyle("display: flex; flex-direction: row; align-items: center; height: 10rpx;");
+        processingBarRow = new ContainerWidget()
+                .inlineStyle("width: 50%; margin-left: 25%; flex-direction: row; align-items: center; height: 10rpx;");
         rebuildProcessingBar();
         return processingBarRow;
     }
 
     private void rebuildProcessingBar() {
         processingBarRow.clearChildren();
-        var finishedLabel = new Label(IComponent.literal(I18n.get("xat.gui.processing") + translateUnit.normalFinishedSize() + "/" + translateUnit.size()));
-        finishedLabel.inlineStyle("size: 40% auto; margin-right: 4rpx;");
-        processingBarRow.addChild(finishedLabel);
-
-        var errorLabel = new Label(IComponent.literal(I18n.get("xat.gui.error") + translateUnit.errorSize() + "/" + translateUnit.size()));
-        errorLabel.inlineStyle("size: 40% auto; margin-left: 4rpx;");
-        processingBarRow.addChild(errorLabel);
+        processingBarRow
+                .addChild(new Label(IComponent.literal(I18n.get("xat.gui.processing") + translateUnit.normalFinishedSize() + "/" + translateUnit.size()))
+                        .inlineStyle("size: 40% auto; margin-right: 4rpx;"))
+                .addChild(new Label(IComponent.literal(I18n.get("xat.gui.error") + translateUnit.errorSize() + "/" + translateUnit.size()))
+                        .inlineStyle("size: 40% auto; margin-left: 4rpx;"));
     }
 
     private ContainerWidget createRunTransKeys() {
-        runTransKeysRow = new ContainerWidget();
-        runTransKeysRow.inlineStyle("display: flex; flex-direction: row; align-items: center; height: 40rpx;");
+        runTransKeysRow = new ContainerWidget()
+                .inlineStyle("width: 50%; margin-left: 25%; flex-direction: row; align-items: center; justify-content: space-around; height: 40rpx;");
         rebuildRunTransKeysRow();
         return runTransKeysRow;
     }
 
     private void rebuildRunTransKeysRow() {
         runTransKeysRow.clearChildren();
-
         var btn1 = WidgetWrapper.button(Component.translatable("xat.gui.btn.run_trans_keys"), b -> {
             if (translateUnit.finished) runTransKeys();
-        });
+        }).inlineStyle("size: 30%    20rpx;");
         btn1.enabled = translateUnit.finished;
-        btn1.inlineStyle("size: 25% 20rpx; margin-left: 4rpx; margin-right: 4rpx;");
-        runTransKeysRow.addChild(btn1);
 
         var btn2 = WidgetWrapper.button(Component.translatable("xat.gui.btn.cancel_inject_lang"), b -> {
             translateUnit.cancel();
             XATDataBase.INSTANCE.enableInjectLang(false);
             AutoTranslate.cancelInjectLanguage();
             onDynamicUpdate();
-        });
+        }).inlineStyle("size: 30% 20rpx;");
         btn2.enabled = XATDataBase.INSTANCE.isEnableInjectLang();
-        btn2.inlineStyle("size: 25% 20rpx; margin-left: 4rpx; margin-right: 4rpx;");
-        runTransKeysRow.addChild(btn2);
 
-        var btn3 = WidgetWrapper.button(Component.translatable("xat.gui.btn.clear_cache"), b -> LangKeyTranslateUnit.I18N_KEYS.clear());
-        btn3.inlineStyle("size: 25% 20rpx; margin-left: 4rpx; margin-right: 4rpx;");
-        runTransKeysRow.addChild(btn3);
+        runTransKeysRow
+                .addChild(btn1)
+                .addChild(btn2)
+                .addChild(WidgetWrapper.button(Component.translatable("xat.gui.btn.clear_cache"), b -> LangKeyTranslateUnit.I18N_KEYS.clear())
+                        .inlineStyle("size: 30% 20rpx;"));
     }
 
     public void runTransKeys() {
@@ -246,7 +236,7 @@ public class XATConfigScreen extends XKLibBaseScreen {
     }
 
     private <T> WidgetWrapper saveButton(Supplier<T> supplier, ModConfigSpec.ConfigValue<T> config) {
-        var btn = SpriteIconButton.builder(Component.empty(), _ -> {
+        return new WidgetWrapper(SpriteIconButton.builder(Component.empty(), _ -> {
                     var t = supplier.get();
                     if (t != null) {
                         config.set(t);
@@ -254,10 +244,8 @@ public class XATConfigScreen extends XKLibBaseScreen {
                     }
                 }, true)
                 .sprite(VanillaUtils.modRL("icon/save"), 16, 16)
-                .build();
-        var wrapper = new WidgetWrapper(btn);
-        wrapper.inlineStyle("size: 20rpx 20rpx;");
-        return wrapper;
+                .build())
+                .inlineStyle("size: 20rpx 20rpx;");
     }
 
     private <T> ContainerWidget createEntry(String key, ModConfigSpec.ConfigValue<T> config, Supplier<ObjectInputBox<T>> inputBSupplier) {
@@ -275,80 +263,69 @@ public class XATConfigScreen extends XKLibBaseScreen {
         input.setValue(config.get());
         input.scrollTo(0);
 
-        syncButton = new WidgetWrapper(
-                net.minecraft.client.gui.components.Button.builder(
-                        Component.literal("S"),
-                        _ -> {
-                            input.setValue(Minecraft.getInstance().getLanguageManager().getSelected());
-                            config.set(input.getValue());
-                            config.save();
-                        }
-                ).bounds(0, 0, 20, 20).build()
-        );
-        syncButton.inlineStyle("size: 20rpx 20rpx;");
+        var syncButton = new WidgetWrapper(
+                Button.builder(
+                        Component.literal("Sync"),
+                        _ -> input.setValue(Minecraft.getInstance().getLanguageManager().getSelected()))
+                        .bounds(0, 0, 20, 20).build())
+                .inlineStyle("size: 30rpx 20rpx;");
 
-        var inputWrapper = wrapInput(input).inlineStyle("width: 100%-28rpx;");
-
-        var panel = new ContainerWidget();
-        panel.inlineStyle("align-items: center; size: 100%-20rpx 20rpx; flex-grow: 1; margin-right: 8rpx;");
-        panel.addChild(inputWrapper);
-        panel.addChild(syncButton);
+        var panel = new ContainerWidget()
+                .inlineStyle("align-items: center; flex-grow: 1; margin-right: 8rpx;")
+                .addChild(wrapInput(input))
+                .addChild(syncButton);
 
         return createEntry_("xat.gui.config.target", panel, saveButton(input::get, config));
     }
 
     private <T extends Enum<T>> ContainerWidget createEntryEnum(String key, ModConfigSpec.ConfigValue<T> config, Class<T> enumValue) {
-        var btn = new CycleButton.Builder<T>((t) -> Component.literal(t.toString()), () -> config.get())
+        var btn = new CycleButton.Builder<>((t) -> Component.literal(t.toString()), config)
                 .withValues(enumValue.getEnumConstants())
                 .displayOnlyValue()
-                .create(Component.empty(), (cbt, t) -> {});
-        var wrapper = new WidgetWrapper(btn);
-        wrapper.inlineStyle("flex-grow: 1; height: 20rpx; margin-right: 8rpx;");
-        return createEntry_(key, wrapper, saveButton(btn::getValue, config));
+                .create(0,0,0,0,Component.empty(),(_,t) -> {
+                    config.set(t);
+                    scrollContent.submitTreeUpdate(this::rebuildContent);
+                });
+        return createEntry_(key,
+                new WidgetWrapper(btn)
+                        .inlineStyle("flex-grow: 1; height: 20rpx; margin-right: 8rpx;"),
+                saveButton(btn::getValue, config));
     }
 
     private ContainerWidget createAPIKeyInput() {
-        var clipboardBtn = WidgetWrapper.button(
-                Component.translatable("xat.gui.config.copy_form_clipboard"),
-                b -> XATConfig.LLM_API_KEY_CONFIG.set(Minecraft.getInstance().keyboardHandler.getClipboard())
-        );
-        clipboardBtn.inlineStyle("flex-grow: 1; height: 20rpx; margin-right: 8rpx;");
-
-        var saveBtn = new WidgetWrapper(
-                net.minecraft.client.gui.components.Button.builder(
-                        Component.literal("S"),
-                        _ -> XATConfig.LLM_API_KEY_CONFIG.save()
-                ).bounds(0, 0, 20, 20).build()
-        );
-        saveBtn.inlineStyle("size: 20rpx 20rpx;");
-
-        return createEntry_("xat.gui.config.llm_api_key", clipboardBtn, saveBtn);
+        return createEntry_("xat.gui.config.llm_api_key",
+                WidgetWrapper.button(
+                                Component.translatable("xat.gui.config.copy_form_clipboard"),
+                                _ -> XATConfig.LLM_API_KEY_CONFIG.set(Minecraft.getInstance().keyboardHandler.getClipboard()))
+                        .inlineStyle("flex-grow: 1; height: 20rpx; margin-right: 8rpx;"),
+                new WidgetWrapper(SpriteIconButton.builder(Component.empty(),
+                                _ -> XATConfig.LLM_API_KEY_CONFIG.save(),true)
+                                .sprite(VanillaUtils.modRL("icon/save"), 16, 16)
+                                .build())
+                        .inlineStyle("size: 20rpx 20rpx;"));
     }
 
     private ContainerWidget createEntry_(String key, Widget input, Widget save) {
-        var row = new ContainerWidget();
-        row.inlineStyle("display: flex; flex-direction: row; align-items: center; height: 40rpx; width: 50%; margin-top: 8rpx; margin-left: 25%;");
-
-        var label = new Label(IComponent.translatable(key));
-        label.inlineStyle("width: 90rpx; margin-right: 16rpx; flex-shrink: 0;");
-        row.addChild(label);
-        row.addChild(input);
-        row.addChild(save);
-        return row;
+        return new ContainerWidget()
+                .inlineStyle("display: flex; flex-direction: row; align-items: center; height: 40rpx; width: 50%; margin-top: 4rpx; margin-left: 25%;")
+                .addChild(new Label(IComponent.translatable(key))
+                        .inlineStyle("width: 90rpx; margin-right: 16rpx; flex-shrink: 0;"))
+                .addChild(input)
+                .addChild(save);
     }
 
     private WidgetWrapper wrapInput(ObjectInputBox<?> input) {
-        var wrapper = new WidgetWrapper(input);
+        var wrapper = new WidgetWrapper(input)
+                .inlineStyle("flex-grow: 1; height: 20rpx; margin-right: 8rpx;");
         wrapper.setUserInput(true);
-        wrapper.inlineStyle("flex-grow: 1; height: 20rpx; margin-right: 8rpx;");
         return wrapper;
     }
 
-    private static <T> ObjectInputBox<T> createInput(java.util.function.Predicate<String> validator, java.util.function.Function<String, T> responder) {
+    private static <T> ObjectInputBox<T> createInput(Predicate<String> validator, Function<String, T> responder) {
         return new ObjectInputBox<>(Minecraft.getInstance().font, 0, 0, 0, 0, Component.empty(), validator, responder);
     }
 
-    private static void setupEditBox(net.minecraft.client.gui.components.EditBox editBox) {
+    private static void setupEditBox(EditBox editBox) {
         editBox.setMaxLength(114514);
         editBox.setCanLoseFocus(true);
         editBox.scrollTo(0);

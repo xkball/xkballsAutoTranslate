@@ -21,7 +21,7 @@
   "xat.gui.config.target": "目标语言：",
   "xat.gui.run_trans_keys": "翻译国际化键值",
   "xat.gui.config.tooltip.sync": "设置为游戏语言",
-  "xat.gui.config.run_trans_notice": "注意：只能使用LLM翻译器！",
+  "xat.gui.config.run_trans_notice": "注意：Google翻译器无法使用！",
   "xat.gui.btn.run_trans_keys": "运行 / 重试",
   "xat.gui.btn.cancel_inject_lang": "取消注入语言映射",
   "xat.gui.btn.clear_cache": "清除缓存",

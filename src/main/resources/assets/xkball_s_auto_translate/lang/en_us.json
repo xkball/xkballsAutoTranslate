@@ -21,7 +21,7 @@
   "xat.gui.config.target": "Target Language:",
   "xat.gui.run_trans_keys": "Translate Internationalization Keys",
   "xat.gui.config.tooltip.sync": "Set as game language",
-  "xat.gui.config.run_trans_notice": "Notice: Can only use LLM translator!",
+  "xat.gui.config.run_trans_notice": "Notice: Can not use google translator!",
   "xat.gui.btn.run_trans_keys": "Run / Retry",
   "xat.gui.btn.cancel_inject_lang": "Cancel Inject Language Map",
   "xat.gui.btn.clear_cache": "Clear Cache",
