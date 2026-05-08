@@ -6,9 +6,7 @@
   "mixins": [
   ],
   "client": [
-    "MixinAbstractWidgetAccess",
     "MixinBookViewScreen",
-    "MixinGuiGraphics",
     "MixinLanguageSelectScreen"
   ],
   "injectors": {

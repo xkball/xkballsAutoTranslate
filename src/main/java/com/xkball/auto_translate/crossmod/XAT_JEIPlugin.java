@@ -1,11 +1,12 @@
 package com.xkball.auto_translate.crossmod;
 
 import com.xkball.auto_translate.utils.VanillaUtils;
+import com.xkball.xklib.resource.ResourceLocation;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,7 +20,7 @@ public class XAT_JEIPlugin implements IModPlugin {
     public static IJeiRuntime runtime;
     
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return VanillaUtils.modRL("jei_plugin");
     }
     

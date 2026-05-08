@@ -1,6 +1,5 @@
 package com.xkball.auto_translate;
 
-import com.xkball.auto_translate.client.gui.frame.core.IPanel;
 import com.xkball.auto_translate.client.gui.screen.XATConfigScreen;
 import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.utils.VanillaUtils;
@@ -49,6 +48,7 @@ public class AutoTranslate {
     public static final String MODID = "xkball_s_auto_translate";
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final boolean IS_DEBUG = SharedConstants.IS_RUNNING_WITH_JDWP;
+    public static volatile Runnable onUpdate = () -> {};
 
     public AutoTranslate(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, XATConfig.SPEC);
@@ -80,21 +80,21 @@ public class AutoTranslate {
         var flag = false;
         if(XATConfig.TRANSLATOR_TYPE == TranslatorType.DEFAULT){
             flag = true;
-            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
-                    .append(Component.translatable("xat.warn.no_translator").withStyle(ChatFormatting.RED)),false);
+            player.sendSystemMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
+                    .append(Component.translatable("xat.warn.no_translator").withStyle(ChatFormatting.RED)));
         }
         if(!XATDataBase.INSTANCE.isEnableInjectLang()){
             flag = true;
-            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
-                    .append(Component.translatable("xat.warn.no_inject").withStyle(ChatFormatting.RED)),false);
+            player.sendSystemMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
+                    .append(Component.translatable("xat.warn.no_inject").withStyle(ChatFormatting.RED)));
         }
         if (flag) {
-            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
+            player.sendSystemMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
                     .append(Component.translatable("xat.warn.open_config_screen")
                     .withStyle(Style.EMPTY
                                     .withColor(ChatFormatting.GREEN)
                                     .withUnderlined(true)
-                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/xat open_config_screen")))),false);
+                                    .withClickEvent(new ClickEvent.RunCommand("/xat open_config_screen")))));
         }
     }
     
@@ -104,6 +104,7 @@ public class AutoTranslate {
                 Commands.literal("xat")
                         .then(Commands.literal("open_config_screen")
                         .executes(s -> {
+                            if(Minecraft.getInstance().screen instanceof XATConfigScreen) return 0;
                             Minecraft.getInstance().setScreen(new XATConfigScreen(null, null));
                             return 0;
                         })));
@@ -119,7 +120,7 @@ public class AutoTranslate {
         I18n.setLanguage(clientLang);
         Language.inject(clientLang);
         Minecraft.getInstance().getLanguageManager().reloadCallback.accept(clientLang);
-        IPanel.GLOBAL_UPDATE_MARKER.setNeedUpdate();
+        onUpdate.run();
     }
     
     public static void cancelInjectLanguage(){

@@ -2,8 +2,8 @@ package com.xkball.auto_translate.utils.translate;
 
 import com.mojang.logging.LogUtils;
 import com.xkball.auto_translate.AutoTranslate;
+import com.xkball.auto_translate.AutoTranslate;
 import com.xkball.auto_translate.XATConfig;
-import com.xkball.auto_translate.client.gui.frame.core.IPanel;
 import com.xkball.auto_translate.data.TranslationCacheSlice;
 import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.llm.LLMRequest;
@@ -58,7 +58,7 @@ public class LangKeyTranslateUnit {
     public synchronized void checkFinish() {
         var contextSize = contexts.size();
         LOGGER.debug("Translating: {}/{}", contextFinished.size(), contextSize);
-        IPanel.GLOBAL_UPDATE_MARKER.setNeedUpdate();
+        AutoTranslate.onUpdate.run();
         if (contextFinished.size() == contextSize) {
             if(this.errorSize() > 0){
                 this.resolveFailedRequest();

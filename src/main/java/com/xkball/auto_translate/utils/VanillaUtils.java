@@ -3,12 +3,12 @@ package com.xkball.auto_translate.utils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.xkball.auto_translate.AutoTranslate;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -31,16 +31,16 @@ import java.util.UUID;
 public class VanillaUtils {
     
     public static final Direction[] DIRECTIONS = Direction.values();
-    public static final ResourceLocation MISSING_TEXTURE = ResourceLocation.withDefaultNamespace("missingno");
+    public static final Identifier MISSING_TEXTURE = Identifier.withDefaultNamespace("missingno");
     public static final int TRANSPARENT = VanillaUtils.getColor(255, 255, 255, 0);
     public static final int GUI_GRAY = VanillaUtils.getColor(30, 30, 30, 200);
     
-    public static ResourceLocation modRL(String path) {
+    public static Identifier modRL(String path) {
         return rLOf(AutoTranslate.MODID, path);
     }
     
-    public static ResourceLocation rLOf(String namespace, String path) {
-        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+    public static Identifier rLOf(String namespace, String path) {
+        return Identifier.fromNamespaceAndPath(namespace, path);
     }
     
     public static EquipmentSlot equipmentSlotFromHand(InteractionHand hand) {
@@ -52,7 +52,7 @@ public class VanillaUtils {
         var level = livingEntity.level();
         var server = livingEntity.level().getServer();
         if (server != null && level instanceof ServerLevel serverLevel) {
-            CommandSourceStack cmdSrc = livingEntity.createCommandSourceStackForNameResolution(serverLevel).withPermission(2);
+            CommandSourceStack cmdSrc = livingEntity.createCommandSourceStackForNameResolution(serverLevel);
             server.getCommands().performPrefixedCommand(cmdSrc, command);
         }
     }
@@ -60,7 +60,7 @@ public class VanillaUtils {
     public static void runCommand(String command, MinecraftServer server, UUID playerUUID) {
         var player = server.getPlayerList().getPlayer(playerUUID);
         if (player != null) {
-            server.getCommands().performPrefixedCommand(player.createCommandSourceStack().withPermission(2), command);
+            server.getCommands().performPrefixedCommand(player.createCommandSourceStack(), command);
         }
     }
     
@@ -108,7 +108,7 @@ public class VanillaUtils {
     }
     
     public static Component getName(Block block) {
-        ResourceLocation rl = BuiltInRegistries.BLOCK.getKey(block);
+        Identifier rl = BuiltInRegistries.BLOCK.getKey(block);
         return Component.translatable("block." + rl.getNamespace() + "." + rl.getPath());
     }
     
@@ -167,22 +167,5 @@ public class VanillaUtils {
         startWithList.addAll(containsList);
         return startWithList;
     }
-    
-    public static class ClientHandler {
-        
-        @OnlyIn(Dist.CLIENT)
-        public static void renderAxis(MultiBufferSource bufferSource, PoseStack poseStack) {
-            var buffer = bufferSource.getBuffer(RenderType.debugLineStrip(8));
-            var matrix = poseStack.last();
-            buffer.addVertex(matrix, 0, 0, 0).setNormal(matrix, -1, 0, 0).setColor(0xFFFF0000);
-            buffer.addVertex(matrix, 100, 0, 0).setNormal(matrix, 1, 0, 0).setColor(0xFFFF0000);
-            buffer.addVertex(matrix, 0, 0, 0).setNormal(matrix, 0, -1, 0).setColor(0xFF00FF00);
-            buffer.addVertex(matrix, 0, 100, 0).setNormal(matrix, 0, 1, 0).setColor(0xFF00FF00);
-            buffer.addVertex(matrix, 0, 0, 0).setNormal(matrix, 0, 0, -1).setColor(0xFF0000FF);
-            buffer.addVertex(matrix, 0, 0, 100).setNormal(matrix, 0, 0, 1).setColor(0xFF0000FF);
-        }
-        
-    }
-    
     
 }

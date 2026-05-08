@@ -17,8 +17,8 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(value = Dist.CLIENT)
 public class XATKeyBind {
     
-    public static final Lazy<KeyMapping> TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.translate", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T,"key.categories.misc"));
-    public static final Lazy<KeyMapping> RE_TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.retranslate", KeyConflictContext.UNIVERSAL, KeyModifier.SHIFT, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T,"key.categories.misc"));
+    public static final Lazy<KeyMapping> TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.translate", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T, KeyMapping.Category.MISC));
+    public static final Lazy<KeyMapping> RE_TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.retranslate", KeyConflictContext.UNIVERSAL, KeyModifier.SHIFT, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T, KeyMapping.Category.MISC));
     
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
@@ -31,10 +31,10 @@ public class XATKeyBind {
         
         @SubscribeEvent
         public static void onKeyInput(ScreenEvent.KeyPressed.Pre event){
-            if(TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))){
+            if(TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyEvent()))){
                 NeoForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(false));
             }
-            if(RE_TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))){
+            if(RE_TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyEvent()))){
                 NeoForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(true));
             }
         }

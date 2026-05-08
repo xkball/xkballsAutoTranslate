@@ -146,9 +146,9 @@ repositories {
 
 dependencies {
 
-//    compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
-//    compileOnly "mezz.jei:jei-${mc_version}-neoforge-api:${jei_version}"
-//    localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
+    compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${mc_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
 
 //    //https://www.curseforge.com/minecraft/mc-mods/ftb-teams-forge
 //    implementation "curse.maven:ftb-teams-forge-404468:6119437"

@@ -2,6 +2,8 @@ package com.xkball.auto_translate.crossmod;
 
 import com.xkball.auto_translate.XATConfig;
 import com.xkball.auto_translate.api.ITranslator;
+// JEI dependency currently not available
+// import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;

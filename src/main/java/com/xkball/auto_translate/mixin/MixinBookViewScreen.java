@@ -6,12 +6,12 @@ import com.xkball.auto_translate.data.TranslationCacheSlice;
 import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.utils.ClientUtils;
 import com.xkball.auto_translate.utils.VanillaUtils;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -58,30 +58,30 @@ public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
         this.addRenderableWidget(xat_btn);
     }
     
-    @Inject(method = "render",at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"))
-    public void onRender(GuiGraphics p_281997_, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci){
-        xat_currentPaceCache.clear();
-        xat_currentPaceCache.addAll(this.cachedPageComponents.stream().map(ClientUtils::getAsString).toList());
-        if(xat_tr.get()){
-            this.submit(false);
-        }
-    }
+//    @Inject(method = "extractRenderState",at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"))
+//    public void onRender(GuiGraphicsExtractor p_281997_, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci){
+//        xat_currentPaceCache.clear();
+//        xat_currentPaceCache.addAll(this.cachedPageComponents.stream().map(ClientUtils::getAsString).toList());
+//        if(xat_tr.get()){
+//            this.submit(false);
+//        }
+//    }
+//
+//    @Inject(method = "extractRenderState", at = @At(value = "INVOKE",
+//            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I",
+//            shift = At.Shift.AFTER))
+//    public void onRenderString(GuiGraphicsExtractor guiGraphics, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci, @Local(ordinal = 2) int i, @Local(ordinal = 6) int l){
+//        if(xat_tr.get()){
+//            var str = XAT_CACHE.get(this.xat_currentPaceCache.get(l));
+//            if(str == null) str = I18n.get("xkball.translator.translating");
+//            guiGraphics.text(font,str,i + 146 + 36,32 + l * 9, 0, false);
+//        }
+//    }
     
-    @Inject(method = "render", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)I",
-            shift = At.Shift.AFTER))
-    public void onRenderString(GuiGraphics guiGraphics, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci, @Local(ordinal = 2) int i, @Local(ordinal = 6) int l){
+    @Inject(method = "extractBackground",at = @At("RETURN"))
+    public void onRenderBg(GuiGraphicsExtractor guiGraphics, int p_296491_, int p_294260_, float p_294869_, CallbackInfo ci){
         if(xat_tr.get()){
-            var str = XAT_CACHE.get(this.xat_currentPaceCache.get(l));
-            if(str == null) str = I18n.get("xkball.translator.translating");
-            guiGraphics.drawString(font,str,i + 146 + 36,32 + l * 9, 0, false);
-        }
-    }
-    
-    @Inject(method = "renderBackground",at = @At("RETURN"))
-    public void onRenderBg(GuiGraphics guiGraphics, int p_296491_, int p_294260_, float p_294869_, CallbackInfo ci){
-        if(xat_tr.get()){
-            guiGraphics.blit(RenderType::guiTextured, BOOK_LOCATION, (this.width - 192) / 2 + 146, 2, 0.0F, 0.0F, 192, 192, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BOOK_LOCATION, (this.width - 192) / 2 + 146, 2, 0.0F, 0.0F, 192, 192, 256, 256);
         }
     }
     
