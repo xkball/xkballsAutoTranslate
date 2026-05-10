@@ -4,7 +4,6 @@ import com.xkball.auto_translate.client.gui.frame.core.IPanel;
 import com.xkball.auto_translate.client.gui.screen.XATConfigScreen;
 import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.utils.translate.LangKeyTranslateUnit;
-import com.xkball.auto_translate.utils.translate.TranslatorType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -77,11 +76,6 @@ public class AutoTranslate {
     public static void onPlayerEnterWorld(ClientPlayerNetworkEvent.LoggingIn event) {
         var player = event.getPlayer();
         var flag = false;
-        if(XATConfig.TRANSLATOR_TYPE == TranslatorType.DEFAULT){
-            flag = true;
-            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
-                    .append(Component.translatable("xat.warn.no_translator").withStyle(ChatFormatting.RED)),false);
-        }
         if(!XATDataBase.INSTANCE.isEnableInjectLang()){
             flag = true;
             player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
