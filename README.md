@@ -8,24 +8,25 @@ This mod add a key binding (default is T) that triggers machine  translation whe
 
 Now this mod have three translators:
 
-- Default:  Will not transltate anything but remind the user revise the config file.
+- Default:  Self-built llm translation relay server.
 - Google Translate: Use google translate web service.Don't need api key, and also cannot set an api key.
 - Large language model: Use openAI api, user need set the api endpoint , api key and model to use.
 
 目前有三个可用翻译器：
 
-- 默认：不会进行任何翻译而是提醒你去修改配置文件；
+- 默认：作者自建的大语言模型翻译中转；
 - 谷歌翻译：使用谷歌翻译，注意根据网络环境，可能需要在配置文件中配置网络代理（全局网络代理可能不起作用）才能使用；
 - 大语言模型翻译：按 OpenAI API 的方式调用大语言模型进行翻译。需要在配置文件中填写 API 提供者的 URL、KEY 和所使用的模型（另外暂时不支持 DeepSeek，因为其不支持 System Prompt）。
 
 ## Feature List 功能列表
 
-| Minecraft Version | Mod Version | Config Screen | External Cache | Translate Item Tooltip | Translate  FTBQ | Translate  Written Book |
-| ----------------- | ----------- | ------------- | -------------- | ---------------------- | --------------- | ----------------------- |
-| 1.21.4/NeoForge   | 1.1.4       | ✅             | ✅              | ✅                      |                 | ✅                       |
-| 1.21.1/NeoForge   | 1.0.4       | ✅             | ✅              | ✅                      | ✅               | ✅                       |
-| 1.20.1/Forge      | 1.-1.3      |               |                | ✅                      | ✅               |                         |
-| 1.19.2/Forge      | 1.-2.3      |               |                | ✅                      | ✅               |                         |
+| Minecraft Version | Mod Version | Config Screen | External Cache | Translate Item Tooltip | Translate  FTBQ | Translate  Written Book | Batch Translate I18n keys | Defalut Translator works out of box. |
+| ----------------- | ----------- | ------------- | -------------- | ---------------------- | --------------- | ----------------------- | ------------------------- | ------------------------------------ |
+| 26.1.2/NeoForge   | 1.2.8       | ✅             | ✅              | ✅                      |                 | ✅                       | ✅                         | ✅                                    |
+| 1.21.4/NeoForge   | 1.1.4       | ✅             | ✅              | ✅                      |                 | ✅                       | ✅                         |                                      |
+| 1.21.1/NeoForge   | 1.0.8       | ✅             | ✅              | ✅                      | ✅               | ✅                       | ✅                         | ✅                                    |
+| 1.20.1/Forge      | 1.-1.8      |               |                | ✅                      | ✅               |                         | ✅                         | ✅                                    |
+| 1.19.2/Forge      | 1.-2.3      |               |                | ✅                      | ✅               |                         |                           |                                      |
 
 
 ## Demonstrate  效果展示
@@ -41,4 +42,5 @@ Now this mod have three translators:
 - Special thanks: https://github.com/SihenZhang/AutoTranslator
 - 无法连续翻译多行的物品 Tooltip，且暂时没有解决方案；
 - FTB 任务可以一次翻译多行，但是对多页任务的支持暂不完善，会把所有翻译结果放在最后一页；
+- 批量翻译键值对功能暂时只有在配置LLM翻译器后才可以真正批量翻译, 使用默认翻译服务会一条条进行翻译, 很慢;
 - 特别感谢: https://github.com/SihenZhang/AutoTranslator
