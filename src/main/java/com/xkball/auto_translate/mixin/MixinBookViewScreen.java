@@ -6,6 +6,8 @@ import com.xkball.auto_translate.data.TranslationCacheSlice;
 import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.utils.ClientUtils;
 import com.xkball.auto_translate.utils.VanillaUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -14,6 +16,7 @@ import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,9 +33,16 @@ import static net.minecraft.client.gui.screens.inventory.BookViewScreen.BOOK_LOC
 
 @Mixin(BookViewScreen.class)
 @SuppressWarnings("AddedMixinMembersNamePattern")
-public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
+public abstract class MixinBookViewScreen extends Screen implements ITranslatableFinder {
     
     @Shadow private List<FormattedCharSequence> cachedPageComponents;
+    
+    @Shadow
+    protected abstract int backgroundLeft();
+    
+    @Shadow
+    protected abstract int backgroundTop();
+    
     @Unique
     private static final TranslationCacheSlice XAT_CACHE = XATDataBase.INSTANCE.createSlice("books");
     
@@ -58,25 +68,27 @@ public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
         this.addRenderableWidget(xat_btn);
     }
     
-//    @Inject(method = "extractRenderState",at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"))
-//    public void onRender(GuiGraphicsExtractor p_281997_, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci){
-//        xat_currentPaceCache.clear();
-//        xat_currentPaceCache.addAll(this.cachedPageComponents.stream().map(ClientUtils::getAsString).toList());
-//        if(xat_tr.get()){
-//            this.submit(false);
-//        }
-//    }
-//
-//    @Inject(method = "extractRenderState", at = @At(value = "INVOKE",
-//            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I",
-//            shift = At.Shift.AFTER))
-//    public void onRenderString(GuiGraphicsExtractor guiGraphics, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci, @Local(ordinal = 2) int i, @Local(ordinal = 6) int l){
-//        if(xat_tr.get()){
-//            var str = XAT_CACHE.get(this.xat_currentPaceCache.get(l));
-//            if(str == null) str = I18n.get("xkball.translator.translating");
-//            guiGraphics.text(font,str,i + 146 + 36,32 + l * 9, 0, false);
-//        }
-//    }
+    @Inject(method = "extractRenderState",at = @At("HEAD"))
+    public void onRender(GuiGraphicsExtractor p_281997_, int p_281262_, int p_283321_, float p_282251_, CallbackInfo ci){
+        xat_currentPaceCache.clear();
+        xat_currentPaceCache.addAll(this.cachedPageComponents.stream().map(ClientUtils::getAsString).toList());
+        if(xat_tr.get()){
+            this.submit(false);
+        }
+    }
+
+    @Inject(method = "visitText", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V",
+            shift = At.Shift.AFTER))
+    public void onRenderString(ActiveTextCollector collector, boolean clickableOnly, CallbackInfo ci, @Local(ordinal = 3) int i){
+        if(xat_tr.get() && i < this.xat_currentPaceCache.size()){
+            int left = this.backgroundLeft();
+            int top = this.backgroundTop();
+            var str = XAT_CACHE.get(this.xat_currentPaceCache.get(i));
+            if(str == null) str = I18n.get("xkball.translator.translating");
+            collector.accept(left + 146 + 36,top + 30 + i * 9, Component.literal(str).withStyle(ChatFormatting.BLACK).withStyle(Style::withoutShadow));
+        }
+    }
     
     @Inject(method = "extractBackground",at = @At("RETURN"))
     public void onRenderBg(GuiGraphicsExtractor guiGraphics, int p_296491_, int p_294260_, float p_294869_, CallbackInfo ci){

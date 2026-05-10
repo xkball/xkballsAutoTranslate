@@ -107,14 +107,6 @@ sourceSets.main.resources {
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
-
-    mcLib
-    implementation {
-        extendsFrom mcLib
-    }
-    additionalRuntimeClasspath {
-        extendsFrom mcLib
-    }
 }
 
 repositories {
@@ -159,8 +151,8 @@ dependencies {
 //    //https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge
 //    implementation "curse.maven:ftb-quests-neoforge-289412:6167037"
 
-    jarJar(mcLib("org.xerial:sqlite-jdbc:3.50.3.0"))
-    jarJar(mcLib("org.yaml:snakeyaml:2.3"))
+    jarJar(implementation "org.xerial:sqlite-jdbc:3.50.3.0")
+    jarJar(implementation "org.yaml:snakeyaml:2.3")
     jarJar(implementation files("libs/xklib-3d-0.0.1.jar"))
     jarJar(implementation files("libs/xklib-ap-0.0.1.jar"))
     jarJar(implementation files("libs/xklib-ui-0.0.1.jar"))
