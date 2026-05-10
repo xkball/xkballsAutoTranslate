@@ -75,11 +75,6 @@ public class AutoTranslate {
     public static void onPlayerEnterWorld(ClientPlayerNetworkEvent.LoggingIn event) {
         var player = event.getPlayer();
         var flag = false;
-        if(XATConfig.TRANSLATOR_TYPE == TranslatorType.DEFAULT){
-            flag = true;
-            player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)
-                    .append(Component.translatable("xat.warn.no_translator").withStyle(ChatFormatting.RED)),false);
-        }
         if(!XATDataBase.INSTANCE.isEnableInjectLang()){
             flag = true;
             player.displayClientMessage(Component.translatable("xat.warn").withStyle(ChatFormatting.WHITE)

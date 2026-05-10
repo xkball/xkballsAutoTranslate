@@ -215,7 +215,7 @@ public class XATConfigScreen extends FrameScreen {
             if(t == null) return;
             config.set(t);
             config.save();
-        }, VanillaUtils.modRL("icon/save"));
+        }, VanillaUtils.modRL("textures/icon/save.png"));
     }
     
     public <T> BaseContainerWidget createEntry(String key, ForgeConfigSpec.ConfigValue<T> config, Supplier<ObjectInputBox<T>> inputBSupplier){
@@ -232,7 +232,7 @@ public class XATConfigScreen extends FrameScreen {
         FrameScreen.setupSimpleEditBox(input);
         input.setValue(config.get());
         input.moveCursorToStart();
-        var syncButton = FrameScreen.iconButton(btn -> input.setValue(Minecraft.getInstance().getLanguageManager().getSelected()),VanillaUtils.modRL("icon/sync"));
+        var syncButton = FrameScreen.iconButton(btn -> input.setValue(Minecraft.getInstance().getLanguageManager().getSelected()),VanillaUtils.modRL("textures/icon/sync.png"));
         var panel = new HorizontalPanel()
                 .addWidget(PanelConfig.of(-28,1)
                         .paddingRight(8)
@@ -256,7 +256,7 @@ public class XATConfigScreen extends FrameScreen {
     public BaseContainerWidget createAPIKeyInput(){
         return createEntry_("xat.gui.config.llm_api_key",
                 createButton("xat.gui.config.copy_form_clipboard",() -> XATConfig.LLM_API_KEY_CONFIG.set(Minecraft.getInstance().keyboardHandler.getClipboard())),
-                iconButton((bt) -> XATConfig.LLM_API_KEY_CONFIG.save(), VanillaUtils.modRL("icon/save")));
+                iconButton((bt) -> XATConfig.LLM_API_KEY_CONFIG.save(), VanillaUtils.modRL("textures/icon/save.png")));
     }
     
     private BaseContainerWidget createEntry_(String key, BaseContainerWidget input, AutoResizeWidgetWrapper save){

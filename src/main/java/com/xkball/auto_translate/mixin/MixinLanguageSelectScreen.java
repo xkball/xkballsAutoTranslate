@@ -33,7 +33,7 @@ public abstract class MixinLanguageSelectScreen extends OptionsSubScreen {
                 w -> w instanceof Button btn && btn.getMessage().equals(CommonComponents.GUI_DONE)
         ).findFirst().ifPresent(btn -> {
             var pos = btn.getRectangle();
-            var xat_btn = new ImageButton(pos.right() + 8, pos.top(),20, 20,0,0,0, VanillaUtils.modRL("icon/xat_icon"), 16, 16,b -> Minecraft.getInstance().setScreen(new XATConfigScreen(this)),Component.empty());
+            var xat_btn = new ImageButton(pos.right() + 8, pos.top(),20, 20,0,0,0, VanillaUtils.modRL("textures/icon/xat_icon.png"), 16, 16,b -> Minecraft.getInstance().setScreen(new XATConfigScreen(this)),Component.empty());
             xat_btn.setTooltip(Tooltip.create(Component.translatable("xat.gui.open_config_screen")));
             this.addRenderableWidget(xat_btn);
         

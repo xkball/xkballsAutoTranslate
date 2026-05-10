@@ -33,7 +33,7 @@ public class XATConfig {
     public static final ForgeConfigSpec.ConfigValue<String> HTTP_PROXY_HOST_CONFIG = BUILDER.comment("The http proxy host if not empty.Default: \"\"").define("http_proxy_host", "");
     public static final ForgeConfigSpec.IntValue HTTP_PROXY_PORT_CONFIG = BUILDER.comment("The http port if http proxy host not empty.").defineInRange("http_proxy_port",0,Integer.MIN_VALUE,Integer.MAX_VALUE);
     public static final ForgeConfigSpec.IntValue MAX_RETRIES_CONFIG = BUILDER.comment("Maximum retries number in case of network error.").defineInRange("max_retries",4,0,Integer.MAX_VALUE);
-    public static final ForgeConfigSpec.ConfigValue<TranslatorType> TRANSLATOR_TYPE_CONFIG = BUILDER.comment("The translator.(The default translator will only notice you to choose a translator.)").defineEnum("translator_type",TranslatorType.DEFAULT,TranslatorType.values());
+    public static final ForgeConfigSpec.ConfigValue<TranslatorType> TRANSLATOR_TYPE_CONFIG = BUILDER.comment("The translator.").defineEnum("translator_type",TranslatorType.DEFAULT,TranslatorType.values());
     public static final ForgeConfigSpec.ConfigValue<String> TARGET_LANGUAGE_CONFIG = BUILDER.comment("The language you want to translate to.Should use Locale Code like \"en_us\".Default: zh_cn").define("target_language", "zh_cn");
     public static final ForgeConfigSpec.ConfigValue<String> LLM_API_URL_CONFIG = BUILDER.comment("This mod use OpenAI API.The API endpoint URL for LLM service.Default: \"\"").define("llm_api_url", "");
     public static final ForgeConfigSpec.ConfigValue<String> LLM_API_KEY_CONFIG = BUILDER.comment("The API key of LLM API.Default: \"\"").define("llm_api_key", "");
