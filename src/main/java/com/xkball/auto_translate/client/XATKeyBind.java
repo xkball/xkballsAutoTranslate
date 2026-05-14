@@ -19,11 +19,13 @@ public class XATKeyBind {
     
     public static final Lazy<KeyMapping> TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.translate", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T, KeyMapping.Category.MISC));
     public static final Lazy<KeyMapping> RE_TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.retranslate", KeyConflictContext.UNIVERSAL, KeyModifier.SHIFT, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T, KeyMapping.Category.MISC));
+    public static final Lazy<KeyMapping> FULL_SCREEN_TRANSLATE_KEY = Lazy.of(() -> new KeyMapping("keys.xkball_s_auto_translate.full_screen_translate", KeyConflictContext.UNIVERSAL, KeyModifier.ALT, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_T, KeyMapping.Category.MISC));
     
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
         event.register(TRANSLATE_KEY.get());
         event.register(RE_TRANSLATE_KEY.get());
+        event.register(FULL_SCREEN_TRANSLATE_KEY.get());
     }
     
     @EventBusSubscriber( value = Dist.CLIENT)
@@ -36,6 +38,9 @@ public class XATKeyBind {
             }
             if(RE_TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyEvent()))){
                 NeoForge.EVENT_BUS.post(new XATGatherTranslateInputEvent(true));
+            }
+            if(FULL_SCREEN_TRANSLATE_KEY.get().isActiveAndMatches(InputConstants.getKey(event.getKeyEvent()))){
+                FullScreenTranslateManager.toggle();
             }
         }
     }

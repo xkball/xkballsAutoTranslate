@@ -20,13 +20,13 @@ Now this mod have three translators:
 
 ## Feature List 功能列表
 
-| Minecraft Version | Mod Version | Config Screen | External Cache | Translate Item Tooltip | Translate  FTBQ | Translate  Written Book | Batch Translate I18n keys | Defalut Translator works out of box. |
-| ----------------- | ----------- | ------------- | -------------- | ---------------------- | --------------- | ----------------------- | ------------------------- | ------------------------------------ |
-| 26.1.2/NeoForge   | 1.2.8       | ✅             | ✅              | ✅                      |                 | ✅                       | ✅                         | ✅                                    |
-| 1.21.4/NeoForge   | 1.1.4       | ✅             | ✅              | ✅                      |                 | ✅                       | ✅                         |                                      |
-| 1.21.1/NeoForge   | 1.0.8       | ✅             | ✅              | ✅                      | ✅               | ✅                       | ✅                         | ✅                                    |
-| 1.20.1/Forge      | 1.-1.8      |               |                | ✅                      | ✅               |                         | ✅                         | ✅                                    |
-| 1.19.2/Forge      | 1.-2.3      |               |                | ✅                      | ✅               |                         |                           |                                      |
+| Minecraft Version | Mod Version | Config Screen | External Cache | Translate Item Tooltip | Translate  FTBQ | Translate  Written Book | Batch Translate I18n keys | Defalut Translator works out of box. | Full Screen  Translate |
+| ----------------- | ----------- | ------------- | -------------- | ---------------------- | --------------- | ----------------------- | ------------------------- | ------------------------------------ | ---------------------- |
+| 26.1.2/NeoForge   | 1.2.9       | ✅             | ✅              | ✅                      |                 | ✅                       | ✅                         | ✅                                    | ✅                      |
+| 1.21.4/NeoForge   | 1.1.4       | ✅             | ✅              | ✅                      |                 | ✅                       | ✅                         |                                      |                        |
+| 1.21.1/NeoForge   | 1.0.8       | ✅             | ✅              | ✅                      | ✅               | ✅                       | ✅                         | ✅                                    |                        |
+| 1.20.1/Forge      | 1.-1.8      |               |                | ✅                      | ✅               |                         | ✅                         | ✅                                    |                        |
+| 1.19.2/Forge      | 1.-2.3      |               |                | ✅                      | ✅               |                         |                           |                                      |                        |
 
 
 ## Demonstrate  效果展示

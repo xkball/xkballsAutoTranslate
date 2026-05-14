@@ -33,5 +33,7 @@
   "xat.warn": "[xkball的自动翻译]: ",
   "xat.warn.no_translator": "未设置有效的翻译器.",
   "xat.warn.no_inject": "未启用翻译本地化键.",
-  "xat.warn.open_config_screen": "点击打开配置界面."
+  "xat.warn.open_config_screen": "点击打开配置界面.",
+  "keys.xkball_s_auto_translate.full_screen_translate": "全屏翻译 (实验性)",
+  "xat.gui.full_screen_translate.enabled": "全屏翻译已开启,按下%s关闭"
 }

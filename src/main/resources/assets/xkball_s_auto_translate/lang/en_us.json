@@ -36,5 +36,7 @@
   "xat.warn.open_config_screen": "Click to open config screen.",
   "xat.gui.btn.clear_all_cache": "Clear All Translation cache.",
   "keys.xkball_s_auto_translate.retranslate": "ReTranslate",
-  "xat.gui.toggle_translate": "Toggle Translate"
+  "keys.xkball_s_auto_translate.full_screen_translate": "Full-Screen Translate (Experimental)",
+  "xat.gui.toggle_translate": "Toggle Translate",
+  "xat.gui.full_screen_translate.enabled": "Full-Screen Translate ON, press %s to disable"
 }
