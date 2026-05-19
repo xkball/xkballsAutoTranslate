@@ -156,7 +156,12 @@ dependencies {
     //https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge
     implementation "curse.maven:ftb-quests-neoforge-289412:7029249"
 
-    jarJar(mcLib("org.xerial:sqlite-jdbc:3.50.3.0"))
+    jarJar(mcLib("org.xerial:sqlite-jdbc:3.50.3.0")){
+        version {
+            strictly '[3.45.0.0, 4.00.0.0)'
+            prefer '3.50.3.0'
+        }
+    }
     jarJar(mcLib("org.yaml:snakeyaml:2.3"))
 
     // For more info:
