@@ -177,7 +177,10 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    implementation(jarJar(files("lib/sqlite-jdbc-3.50.3.0.jar")))
+    jarJar("org.xerial:sqlite-jdbc:3.50.3.0").version {
+        require("[3.45.0.0, 4.00.0.0)")
+    }
+    runtimeOnly((files("lib/sqlite-jdbc-3.50.3.0.jar")))
     implementation(jarJar("org.yaml:snakeyaml:2.3"))
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
