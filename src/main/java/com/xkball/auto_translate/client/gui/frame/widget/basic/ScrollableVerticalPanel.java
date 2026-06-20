@@ -27,8 +27,8 @@ import javax.annotation.Nullable;
 
 public class ScrollableVerticalPanel extends VerticalPanel {
     
-    protected static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("widget/scroller");
-    protected static final ResourceLocation SCROLLER_BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("widget/scroller_background");
+    protected static final ResourceLocation SCROLLER_SPRITE = VanillaUtils.modRL("textures/gui/widget/scroller.png");
+    protected static final ResourceLocation SCROLLER_BACKGROUND_SPRITE = VanillaUtils.modRL("textures/gui/widget/scroller_background.png");
     
     public IntArrayList heightList = new IntArrayList();
     public int maxScroll = 0;
@@ -148,8 +148,8 @@ public class ScrollableVerticalPanel extends VerticalPanel {
             }
             
             RenderSystem.enableBlend();
-            guiGraphics.blit(SCROLLER_BACKGROUND_SPRITE, l, y, 0, 0, 6, h);
-            guiGraphics.blit(SCROLLER_SPRITE, l, k, 0, 0, 6, i1);
+            guiGraphics.blit(SCROLLER_BACKGROUND_SPRITE, l, y, 6, h, 0, 0, 6, 32, 6, 32);
+            guiGraphics.blit(SCROLLER_SPRITE, l, k, 6, i1, 0, 0, 6, 32, 6, 32);
             RenderSystem.disableBlend();
            
         }

@@ -1,11 +1,11 @@
 package com.xkball.auto_translate.mixin;
 
 import com.xkball.auto_translate.client.gui.screen.XATConfigScreen;
+import com.xkball.auto_translate.client.gui.frame.screen.FrameScreen;
 import com.xkball.auto_translate.utils.VanillaUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.LanguageSelectScreen;
 import net.minecraft.client.gui.screens.OptionsSubScreen;
@@ -33,7 +33,9 @@ public abstract class MixinLanguageSelectScreen extends OptionsSubScreen {
                 w -> w instanceof Button btn && btn.getMessage().equals(CommonComponents.GUI_DONE)
         ).findFirst().ifPresent(btn -> {
             var pos = btn.getRectangle();
-            var xat_btn = new ImageButton(pos.right() + 8, pos.top(),20, 20,0,0,0, VanillaUtils.modRL("textures/icon/xat_icon.png"), 16, 16,b -> Minecraft.getInstance().setScreen(new XATConfigScreen(this)),Component.empty());
+            var xat_btn = FrameScreen.createIconButton(pos.right() + 8, pos.top(), 20, 20,
+                    b -> Minecraft.getInstance().setScreen(new XATConfigScreen(this)),
+                    VanillaUtils.modRL("textures/icon/xat_icon.png"), 16, 16);
             xat_btn.setTooltip(Tooltip.create(Component.translatable("xat.gui.open_config_screen")));
             this.addRenderableWidget(xat_btn);
         

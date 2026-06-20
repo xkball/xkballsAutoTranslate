@@ -14,13 +14,13 @@ import com.xkball.auto_translate.client.gui.frame.widget.basic.AutoResizeWidgetW
 import com.xkball.auto_translate.client.gui.frame.widget.basic.HorizontalPanel;
 import com.xkball.auto_translate.client.gui.frame.widget.basic.VerticalPanel;
 import com.xkball.auto_translate.client.gui.widget.ObjectInputBox;
+import com.xkball.auto_translate.utils.VanillaUtils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -112,7 +112,7 @@ public class FrameScreen extends Screen implements IUpdateMarker {
                                                 .fixWidth(20)
                                                 .tooltip("xat.gui.open_config_file")
                                                 .apply(iconButton(btn -> Util.getPlatform().openFile(FMLPaths.CONFIGDIR.get().resolve("xkball_s_auto_translate-common.toml").toFile()),
-                                                        ResourceLocation.withDefaultNamespace("toast/recipe_book"))))
+                                                        VanillaUtils.modRL("textures/gui/toast/recipe_book.png"), 20, 20)))
                         ))
                 .addWidget(PanelConfig.of(1, 0.92f)
                         .sizeLimitYMax(height - 40)
@@ -158,8 +158,29 @@ public class FrameScreen extends Screen implements IUpdateMarker {
     }
     
     public static AutoResizeWidgetWrapper iconButton(Button.OnPress onPress, ResourceLocation sprite) {
-        var btn = new ImageButton(0,0,0,0,0,0,0,sprite,16,16,onPress,Component.empty());
+        return iconButton(onPress, sprite, 16, 16);
+    }
+    
+    public static AutoResizeWidgetWrapper iconButton(Button.OnPress onPress, ResourceLocation sprite, int iconWidth, int iconHeight) {
+        var btn = createIconButton(0, 0, 0, 0, onPress, sprite, iconWidth, iconHeight);
         return AutoResizeWidgetWrapper.of(btn);
+    }
+    
+    public static Button createIconButton(int x, int y, int width, int height, Button.OnPress onPress, ResourceLocation sprite, int iconWidth, int iconHeight) {
+        return Button.builder(Component.empty(), onPress).bounds(x, y, width, height).build(new Function<>() {
+            @Override
+            public Button apply(Button.Builder builder) {
+                return new Button(builder) {
+                    @Override
+                    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+                        int x = this.getX() + (this.width - iconWidth) / 2;
+                        int y = this.getY() + (this.height - iconHeight) / 2;
+                        guiGraphics.blit(sprite, x, y, 0, 0, iconWidth, iconHeight, iconWidth, iconHeight);
+                    }
+                };
+            }
+        });
     }
     
     public static AutoResizeWidgetWrapper createButton(String message, Runnable onPress) {

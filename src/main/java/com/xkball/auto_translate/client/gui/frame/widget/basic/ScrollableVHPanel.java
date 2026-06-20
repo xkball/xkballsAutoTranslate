@@ -38,10 +38,18 @@ public class ScrollableVHPanel extends ScrollableVerticalPanel{
                 k = this.getX();
             }
             
-            guiGraphics.blit(SCROLLER_BACKGROUND_SPRITE, x, l, 0, 0, w, 6);
-            guiGraphics.blit(SCROLLER_SPRITE, k, l, 0, 0, i1, 6);
+            renderHorizontalScroller(guiGraphics, SCROLLER_BACKGROUND_SPRITE, x, l, w);
+            renderHorizontalScroller(guiGraphics, SCROLLER_SPRITE, k, l, i1);
             
         }
+    }
+    
+    protected void renderHorizontalScroller(GuiGraphics guiGraphics, net.minecraft.resources.ResourceLocation sprite, int x, int y, int width) {
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(x, y + 6, 0);
+        guiGraphics.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(-90));
+        guiGraphics.blit(sprite, 0, 0, 6, width, 0, 0, 6, 32, 6, 32);
+        guiGraphics.pose().popPose();
     }
     
     @Override

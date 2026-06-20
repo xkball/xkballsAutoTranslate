@@ -2,12 +2,12 @@ package com.xkball.auto_translate.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.xkball.auto_translate.api.ITranslatableFinder;
+import com.xkball.auto_translate.client.gui.frame.screen.FrameScreen;
 import com.xkball.auto_translate.data.TranslationCacheSlice;
 import com.xkball.auto_translate.data.XATDataBase;
 import com.xkball.auto_translate.utils.ClientUtils;
 import com.xkball.auto_translate.utils.VanillaUtils;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
@@ -48,12 +48,11 @@ public class MixinBookViewScreen extends Screen implements ITranslatableFinder {
     
     @Inject(method = "init",at = @At("RETURN"))
     public void onInit(CallbackInfo ci){
-        var xat_btn = new ImageButton(this.width / 2 + 100 + 8, 196,20, 20,
-                0,0,0,VanillaUtils.modRL("icon/xat_icon"), 16, 16,
-                 b -> {
+        var xat_btn = FrameScreen.createIconButton(this.width / 2 + 100 + 8, 196, 20, 20,
+                b -> {
                     xat_tr.set(!xat_tr.get());
                     if(xat_tr.get()) this.submit(false);
-                },Component.empty());
+                }, VanillaUtils.modRL("textures/icon/xat_icon.png"), 16, 16);
         xat_btn.setTooltip(Tooltip.create(Component.translatable("xat.gui.toggle_translate")));
         this.addRenderableWidget(xat_btn);
     }
